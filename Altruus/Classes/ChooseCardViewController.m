@@ -33,7 +33,6 @@
 @property (nonatomic, strong) NSMutableArray *cards;
 @property (nonatomic, strong) NSMutableArray *arrayCards;
 
-
 @end
 
 @implementation ChooseCardViewController
