@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="12141" systemVersion="16G29" minimumToolsVersion="Xcode 7.3" sourceLanguage="Objective-C" userDefinedModelVersionIdentifier="">
+    <entity name="Friend" representedClassName="Friend" syncable="YES">
+        <attribute name="firstName" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="fullName" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="lastName" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="origin" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="phoneNumber" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="phoneWithoutLada" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="photo" optional="YES" attributeType="String" syncable="YES"/>
+    </entity>
+    <entity name="GiftsReceived" syncable="YES">
+        <attribute name="date" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="giftCode" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="giftName" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="idGift" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="image" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="merchantName" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="senderName" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="senderPicture" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="status" optional="YES" attributeType="String" syncable="YES"/>
+    </entity>
+    <entity name="Organization" representedClassName="Organization" syncable="YES">
+        <attribute name="distance" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="idO" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="origin" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="photo" optional="YES" attributeType="String" syncable="YES"/>
+    </entity>
+    <entity name="Promo" representedClassName="Promo" syncable="YES">
+        <attribute name="donated" optional="YES" attributeType="Boolean" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="expires" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="from" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="redeemed" optional="YES" attributeType="Boolean" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="shareText" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="title" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="user" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="User" inverseName="promos" inverseEntity="User" syncable="YES"/>
+    </entity>
+    <entity name="UpdatesGifts" syncable="YES">
+        <attribute name="datetime" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="giftName" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="merchantName" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="picture" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="pictureType" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="userFrom" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="userTo" optional="YES" attributeType="String" syncable="YES"/>
+    </entity>
+    <entity name="User" representedClassName="User" syncable="YES">
+        <attribute name="email" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="fbID" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="fbIDAltruus" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="fbPostPermission" optional="YES" attributeType="Boolean" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="fbProviderID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="fbToken" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="fbUser" optional="YES" attributeType="Boolean" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="firstLogin" optional="YES" attributeType="Boolean" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="firstname" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="lastname" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="linkedFB" optional="YES" attributeType="Boolean" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="linkedIG" optional="YES" attributeType="Boolean" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="linkedTW" optional="YES" attributeType="Boolean" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="loggedIn" optional="YES" attributeType="Boolean" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="picData" optional="YES" attributeType="Binary" syncable="YES"/>
+        <attribute name="pushID" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="tokenAltruus" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="twID" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="twProviderID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="twToken" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="twUsername" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="userID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="userIDAltruus" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="username" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="promos" optional="YES" toMany="YES" deletionRule="Nullify" ordered="YES" destinationEntity="Promo" inverseName="user" inverseEntity="Promo" syncable="YES"/>
+    </entity>
+    <elements>
+        <element name="Friend" positionX="-351" positionY="153" width="128" height="150"/>
+        <element name="Organization" positionX="-342" positionY="162" width="128" height="120"/>
+        <element name="Promo" positionX="-288" positionY="-27" width="128" height="150"/>
+        <element name="User" positionX="-468" positionY="-9" width="128" height="420"/>
+        <element name="GiftsReceived" positionX="-351" positionY="153" width="128" height="180"/>
+        <element name="UpdatesGifts" positionX="-342" positionY="162" width="128" height="150"/>
+    </elements>
+</model>

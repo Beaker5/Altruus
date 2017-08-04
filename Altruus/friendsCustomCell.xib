@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="12118" systemVersion="16E195" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12086"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="friendsCell" rowHeight="115" id="VaO-et-vNQ" customClass="COFriendsCell">
+            <rect key="frame" x="0.0" y="0.0" width="364" height="115"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="VaO-et-vNQ" id="g0D-Jx-9A8">
+                <rect key="frame" x="0.0" y="0.0" width="364" height="114.5"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="placeholder" translatesAutoresizingMaskIntoConstraints="NO" id="W3x-Yi-qdi">
+                        <rect key="frame" x="8" y="27" width="60" height="60"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="60" id="tEQ-cb-bxb"/>
+                            <constraint firstAttribute="height" constant="60" id="wKA-V4-gG5"/>
+                        </constraints>
+                    </imageView>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" placeholderIntrinsicWidth="269" placeholderIntrinsicHeight="21" text="Test User 1" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bnq-x8-RSP" customClass="COLabel">
+                        <rect key="frame" x="76" y="46" width="269" height="21"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                        <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                </subviews>
+                <constraints>
+                    <constraint firstItem="bnq-x8-RSP" firstAttribute="leading" secondItem="W3x-Yi-qdi" secondAttribute="trailing" constant="8" id="4rD-Yg-aIw"/>
+                    <constraint firstItem="W3x-Yi-qdi" firstAttribute="leading" secondItem="g0D-Jx-9A8" secondAttribute="leading" constant="8" id="Qc7-vS-HBt"/>
+                    <constraint firstAttribute="centerY" secondItem="W3x-Yi-qdi" secondAttribute="centerY" id="WFp-xD-wEv"/>
+                    <constraint firstItem="W3x-Yi-qdi" firstAttribute="top" secondItem="g0D-Jx-9A8" secondAttribute="top" constant="22" id="YKj-sp-XBx"/>
+                    <constraint firstItem="bnq-x8-RSP" firstAttribute="centerY" secondItem="W3x-Yi-qdi" secondAttribute="centerY" constant="-0.5" id="ziM-VB-LZ6"/>
+                    <constraint firstAttribute="bottom" secondItem="W3x-Yi-qdi" secondAttribute="bottom" constant="22" id="zqw-3r-GRZ"/>
+                </constraints>
+                <variation key="default">
+                    <mask key="constraints">
+                        <exclude reference="YKj-sp-XBx"/>
+                        <exclude reference="zqw-3r-GRZ"/>
+                    </mask>
+                </variation>
+            </tableViewCellContentView>
+            <connections>
+                <outlet property="profileNameLabel" destination="bnq-x8-RSP" id="Oea-LE-XFZ"/>
+                <outlet property="profilePicImageView" destination="W3x-Yi-qdi" id="4Yw-N2-dMb"/>
+            </connections>
+            <point key="canvasLocation" x="370" y="191.5"/>
+        </tableViewCell>
+    </objects>
+    <resources>
+        <image name="placeholder" width="50" height="50"/>
+    </resources>
+</document>

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>SchemeUserState</key>
+	<dict>
+		<key>Altruus-Abundance copy.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<true/>
+			<key>orderHint</key>
+			<integer>23</integer>
+		</dict>
+		<key>Altruus-Abundance.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+			<key>orderHint</key>
+			<integer>0</integer>
+		</dict>
+		<key>Altruus-V2 2.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>26</integer>
+		</dict>
+		<key>Altruus-V2.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+			<key>orderHint</key>
+			<integer>24</integer>
+		</dict>
+		<key>Altruus.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>25</integer>
+		</dict>
+	</dict>
+	<key>SuppressBuildableAutocreation</key>
+	<dict>
+		<key>11A5A2D11D6CD31A007F4FBE</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>11A5A33A1D6CD6B0007F4FBE</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>11F5E7181ACA101A0009D24A</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>11F5E7341ACA101B0009D24A</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+	</dict>
+</dict>
+</plist>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="12118" systemVersion="16E195" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12086"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="menuCell" rowHeight="75" id="KGk-i7-Jjw" customClass="MenuCell">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="75"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
+                <rect key="frame" x="0.0" y="0.0" width="320" height="74.5"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Menu-About" translatesAutoresizingMaskIntoConstraints="NO" id="gvw-Be-nwK">
+                        <rect key="frame" x="29" y="22" width="30" height="30"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="30" id="Sdq-Zk-YLr"/>
+                            <constraint firstAttribute="height" constant="30" id="dsp-9M-T8i"/>
+                        </constraints>
+                    </imageView>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="About Altruus" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ELH-bp-Pne">
+                        <rect key="frame" x="91" y="26" width="105" height="21"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                        <color key="textColor" red="0.19215686619281769" green="0.31372550129890442" blue="0.45098039507865906" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                </subviews>
+                <constraints>
+                    <constraint firstItem="gvw-Be-nwK" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="29" id="7wh-0k-S7b"/>
+                    <constraint firstItem="ELH-bp-Pne" firstAttribute="leading" secondItem="gvw-Be-nwK" secondAttribute="trailing" constant="32" id="Ych-Pc-jzl"/>
+                    <constraint firstItem="ELH-bp-Pne" firstAttribute="centerY" secondItem="gvw-Be-nwK" secondAttribute="centerY" id="c0r-le-gLq"/>
+                    <constraint firstItem="gvw-Be-nwK" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="kwF-KT-ox8"/>
+                </constraints>
+            </tableViewCellContentView>
+            <connections>
+                <outlet property="iconImage" destination="gvw-Be-nwK" id="C6R-Vu-wvf"/>
+                <outlet property="nameLabel" destination="ELH-bp-Pne" id="Wrx-VN-E8L"/>
+            </connections>
+            <point key="canvasLocation" x="524" y="304.5"/>
+        </tableViewCell>
+    </objects>
+    <resources>
+        <image name="Menu-About" width="22" height="22"/>
+    </resources>
+</document>

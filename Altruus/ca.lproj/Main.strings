@@ -1,0 +1,96 @@
+
+/* Class = "UILabel"; text = "Profile"; ObjectID = "5RC-1a-iI2"; */
+"5RC-1a-iI2.text" = "Profile";
+
+/* Class = "UILabel"; text = "Post"; ObjectID = "612-oW-D4P"; */
+"612-oW-D4P.text" = "Post";
+
+/* Class = "UITextField"; placeholder = "Password"; ObjectID = "6go-0y-JjC"; */
+"6go-0y-JjC.placeholder" = "Password";
+
+/* Class = "UINavigationItem"; title = "Profile"; ObjectID = "7Ff-Dg-ys9"; */
+"7Ff-Dg-ys9.title" = "Profile";
+
+/* Class = "UILabel"; text = "Altruus, LLC"; ObjectID = "80y-iR-pxz"; */
+"80y-iR-pxz.text" = "Altruus, LLC";
+
+/* Class = "UILabel"; text = "Coupon"; ObjectID = "BqC-VD-mj8"; */
+"BqC-VD-mj8.text" = "Coupon";
+
+/* Class = "UILabel"; text = "TWITTER"; ObjectID = "DGc-Fo-TLN"; */
+"DGc-Fo-TLN.text" = "TWITTER";
+
+/* Class = "UITextField"; placeholder = "Username"; ObjectID = "GFw-ec-2K6"; */
+"GFw-ec-2K6.placeholder" = "Username";
+
+/* Class = "UILabel"; text = "This is totally awesome stuff man"; ObjectID = "LPH-Md-17S"; */
+"LPH-Md-17S.text" = "This is totally awesome stuff man";
+
+/* Class = "UILabel"; text = "INSTAGRAM"; ObjectID = "Q7N-1d-0XV"; */
+"Q7N-1d-0XV.text" = "INSTAGRAM";
+
+/* Class = "UILabel"; text = "Would you like to post the following to your social media account?"; ObjectID = "RL1-jW-2HO"; */
+"RL1-jW-2HO.text" = "Would you like to post the following to your social media account?";
+
+/* Class = "UILabel"; text = "Feedback"; ObjectID = "U3g-sy-W2U"; */
+"U3g-sy-W2U.text" = "Feedback";
+
+/* Class = "UIButton"; normalTitle = "Post"; ObjectID = "VIu-7C-87h"; */
+"VIu-7C-87h.normalTitle" = "Post";
+
+/* Class = "UIViewController"; title = "Menu"; ObjectID = "VJi-bv-OwH"; */
+"VJi-bv-OwH.title" = "Menu";
+
+/* Class = "UIButton"; normalTitle = "Home"; ObjectID = "WEH-Zi-Azd"; */
+"WEH-Zi-Azd.normalTitle" = "Home";
+
+/* Class = "UIButton"; normalTitle = "Sign Up"; ObjectID = "XBU-BQ-G0E"; */
+"XBU-BQ-G0E.normalTitle" = "Sign Up";
+
+/* Class = "UIViewController"; title = "Sign Up Controller"; ObjectID = "XjP-TA-T4P"; */
+"XjP-TA-T4P.title" = "Sign Up Controller";
+
+/* Class = "UILabel"; text = "Linked Social Media:"; ObjectID = "Y7b-UZ-yro"; */
+"Y7b-UZ-yro.text" = "Linked Social Media:";
+
+/* Class = "UILabel"; text = "PREVIEW"; ObjectID = "bYg-H0-tVj"; */
+"bYg-H0-tVj.text" = "PREVIEW";
+
+/* Class = "UILabel"; text = "Loading QR Scanner..."; ObjectID = "c3N-ms-Wqw"; */
+"c3N-ms-Wqw.text" = "Loading QR Scanner...";
+
+/* Class = "UILabel"; text = "Select:"; ObjectID = "d4A-Ad-onA"; */
+"d4A-Ad-onA.text" = "Seleccionar:";
+
+/* Class = "UILabel"; text = "FACEBOOK"; ObjectID = "dGx-Og-r2Q"; */
+"dGx-Og-r2Q.text" = "FACEBOOK";
+
+/* Class = "UIButton"; normalTitle = "Cancel"; ObjectID = "gdF-L3-fdd"; */
+"gdF-L3-fdd.normalTitle" = "Cancel";
+
+/* Class = "UILabel"; text = "LEAVE ANONYMOUSLY"; ObjectID = "ifc-Na-q2b"; */
+"ifc-Na-q2b.text" = "LLICÈNCIA anònimament";
+
+/* Class = "UITextField"; text = "CJ THE Grreat"; ObjectID = "jCZ-a7-UrL"; */
+"jCZ-a7-UrL.text" = "CJ THE Grreat";
+
+/* Class = "UIView"; accessibilityLabel = "Linked View"; ObjectID = "jhI-ts-4rj"; */
+"jhI-ts-4rj.accessibilityLabel" = "Linked View";
+
+/* Class = "UITextField"; placeholder = "Username"; ObjectID = "l6k-Ga-0M1"; */
+"l6k-Ga-0M1.placeholder" = "Username";
+
+/* Class = "UILabel"; text = "Don't have an account yet?"; ObjectID = "mKY-8G-qOG"; */
+"mKY-8G-qOG.text" = "Don't have an account yet?";
+
+/* Class = "UITextField"; placeholder = "Password"; ObjectID = "nB6-MZ-tzU"; */
+"nB6-MZ-tzU.placeholder" = "Password";
+
+/* Class = "UILabel"; text = "E3T6U8TD451SD29YTE"; ObjectID = "pQb-F8-4j9"; */
+"pQb-F8-4j9.text" = "E3T6U8TD451SD29YTE";
+
+/* Class = "UILabel"; text = "Linked Social Media:"; ObjectID = "t4t-V8-awE"; */
+"t4t-V8-awE.text" = "Linked Social Media:";
+
+/* Class = "UIViewController"; title = "Profile"; ObjectID = "yff-KF-tW0"; */
+"yff-KF-tW0.title" = "Profile";

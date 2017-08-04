@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="12121" systemVersion="16F73" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12089"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="giftCell" id="wSl-iL-RvP" customClass="GiftsReceivedTableViewCell">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="75"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="wSl-iL-RvP" id="dlh-Mr-NIj">
+                <rect key="frame" x="0.0" y="0.0" width="287" height="74.5"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="lf7-Ls-knD" customClass="RoundedImageView">
+                        <rect key="frame" x="8" y="12" width="50" height="50"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="50" id="BBc-a8-Plb"/>
+                            <constraint firstAttribute="width" constant="50" id="Dex-YT-aVu"/>
+                        </constraints>
+                    </imageView>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="You sent a free gift to somebody at Apple" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="FE3-7v-ghA">
+                        <rect key="frame" x="68" y="12" width="201" height="33.5"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                        <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="8 hours ago" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7Dt-hS-16A">
+                        <rect key="frame" x="68" y="50.5" width="58" height="12"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="10"/>
+                        <color key="textColor" red="0.58431375029999999" green="0.66666668650000005" blue="0.76078432799999995" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="redeeemed" translatesAutoresizingMaskIntoConstraints="NO" id="7bd-Jb-kIb">
+                        <rect key="frame" x="100" y="12" width="87" height="50"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="50" id="jur-eU-abk"/>
+                        </constraints>
+                    </imageView>
+                </subviews>
+                <constraints>
+                    <constraint firstItem="7bd-Jb-kIb" firstAttribute="centerX" secondItem="dlh-Mr-NIj" secondAttribute="centerX" id="FJr-5L-0tY"/>
+                    <constraint firstItem="lf7-Ls-knD" firstAttribute="leading" secondItem="dlh-Mr-NIj" secondAttribute="leading" constant="8" id="P9b-r2-pqt"/>
+                    <constraint firstAttribute="trailingMargin" secondItem="FE3-7v-ghA" secondAttribute="trailing" constant="10" id="cnp-bF-ccQ"/>
+                    <constraint firstItem="FE3-7v-ghA" firstAttribute="leading" secondItem="lf7-Ls-knD" secondAttribute="trailing" constant="10" id="dtW-jV-Ivl"/>
+                    <constraint firstItem="FE3-7v-ghA" firstAttribute="top" secondItem="lf7-Ls-knD" secondAttribute="top" id="evX-CO-PnY"/>
+                    <constraint firstItem="7bd-Jb-kIb" firstAttribute="centerY" secondItem="dlh-Mr-NIj" secondAttribute="centerY" id="f7D-4l-xEm"/>
+                    <constraint firstItem="7Dt-hS-16A" firstAttribute="leading" secondItem="FE3-7v-ghA" secondAttribute="leading" id="ro9-Ff-Zos"/>
+                    <constraint firstItem="7Dt-hS-16A" firstAttribute="top" secondItem="FE3-7v-ghA" secondAttribute="bottom" constant="5" id="v6y-Af-kYq"/>
+                    <constraint firstItem="lf7-Ls-knD" firstAttribute="centerY" secondItem="dlh-Mr-NIj" secondAttribute="centerY" id="zs4-yr-ISp"/>
+                </constraints>
+            </tableViewCellContentView>
+            <connections>
+                <outlet property="imageview" destination="lf7-Ls-knD" id="qUP-Fo-On1"/>
+                <outlet property="mainLabel" destination="FE3-7v-ghA" id="S7l-Jj-sdg"/>
+                <outlet property="redeemImageview" destination="7bd-Jb-kIb" id="Gt9-cl-Uad"/>
+                <outlet property="subLabel" destination="7Dt-hS-16A" id="NHk-Uv-w6d"/>
+            </connections>
+            <point key="canvasLocation" x="537" y="246.5"/>
+        </tableViewCell>
+    </objects>
+    <resources>
+        <image name="redeeemed" width="87" height="30"/>
+    </resources>
+</document>

@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="12120" systemVersion="16E195" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12088"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Profile-->
+        <scene sceneID="fRX-il-6mP">
+            <objects>
+                <viewController storyboardIdentifier="about" useStoryboardIdentifierAsRestorationIdentifier="YES" id="olH-e2-Wwf" customClass="AboutViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="3RF-hR-deD"/>
+                        <viewControllerLayoutGuide type="bottom" id="ckP-Qd-CtD"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="L9C-TZ-oEF">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="AfY-Uy-Bvr">
+                                <rect key="frame" x="50" y="84" width="500" height="128"/>
+                                <color key="backgroundColor" red="0.97254902119999997" green="0.98431372640000003" blue="0.99607843159999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="128" id="2Jm-N2-NmA"/>
+                                </constraints>
+                            </view>
+                            <view contentMode="scaleToFill" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="DtC-ZX-CBh">
+                                <rect key="frame" x="30" y="109" width="540" height="451"/>
+                                <subviews>
+                                    <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Gift-Box-Logo" translatesAutoresizingMaskIntoConstraints="NO" id="vUU-47-C31" customClass="RoundedImageView">
+                                        <rect key="frame" x="220" y="25" width="100" height="100"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="100" id="VMg-k7-hRJ"/>
+                                            <constraint firstAttribute="width" constant="100" id="qbx-hf-lXg"/>
+                                        </constraints>
+                                    </imageView>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="About Altruus" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="TVN-EM-laZ">
+                                        <rect key="frame" x="218" y="150" width="105" height="21"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <color key="textColor" red="0.24705882370000001" green="0.31372550129999999" blue="0.38823530080000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Our idea" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="FlP-zQ-LdK">
+                                        <rect key="frame" x="246" y="176" width="49" height="15"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                        <color key="textColor" red="0.58431375026702881" green="0.66666668653488159" blue="0.7607843279838562" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="20" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="uco-fl-uTX">
+                                        <rect key="frame" x="20" y="216" width="500" height="57.5"/>
+                                        <string key="text">Givers are happier people! We are extremely passionate about altruism.
+
+We love to give. We love to share. We created this app to empower people to become happier by being givers to friends, strangers and non-profits.</string>
+                                        <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                        <color key="textColor" red="0.58431375029999999" green="0.66666668650000005" blue="0.76078432799999995" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                </subviews>
+                                <color key="backgroundColor" red="1" green="0.097246997469999999" blue="0.054578795909999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <constraints>
+                                    <constraint firstItem="FlP-zQ-LdK" firstAttribute="top" secondItem="TVN-EM-laZ" secondAttribute="bottom" constant="5" id="6jN-in-5xm"/>
+                                    <constraint firstItem="uco-fl-uTX" firstAttribute="top" secondItem="FlP-zQ-LdK" secondAttribute="bottom" constant="25" id="DOT-u0-QTn"/>
+                                    <constraint firstItem="uco-fl-uTX" firstAttribute="leading" secondItem="DtC-ZX-CBh" secondAttribute="leading" constant="20" id="E2V-AG-XbL"/>
+                                    <constraint firstItem="uco-fl-uTX" firstAttribute="centerX" secondItem="DtC-ZX-CBh" secondAttribute="centerX" id="Rqz-MX-dOu"/>
+                                    <constraint firstItem="TVN-EM-laZ" firstAttribute="centerX" secondItem="vUU-47-C31" secondAttribute="centerX" id="SMm-PJ-DPL"/>
+                                    <constraint firstItem="vUU-47-C31" firstAttribute="centerX" secondItem="DtC-ZX-CBh" secondAttribute="centerX" id="Vbl-Hs-FL4"/>
+                                    <constraint firstItem="TVN-EM-laZ" firstAttribute="top" secondItem="vUU-47-C31" secondAttribute="bottom" constant="25" id="ePn-HI-0jp"/>
+                                    <constraint firstAttribute="trailing" secondItem="uco-fl-uTX" secondAttribute="trailing" constant="20" id="fUn-lB-2RR"/>
+                                    <constraint firstItem="FlP-zQ-LdK" firstAttribute="centerX" secondItem="TVN-EM-laZ" secondAttribute="centerX" id="phG-sO-tiC"/>
+                                    <constraint firstItem="vUU-47-C31" firstAttribute="top" secondItem="DtC-ZX-CBh" secondAttribute="top" constant="25" id="uJi-eh-P14"/>
+                                </constraints>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" red="0.91764706370000004" green="0.95686274770000002" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstAttribute="trailing" secondItem="DtC-ZX-CBh" secondAttribute="trailing" constant="30" id="4H4-qW-qVo"/>
+                            <constraint firstItem="DtC-ZX-CBh" firstAttribute="centerX" secondItem="L9C-TZ-oEF" secondAttribute="centerX" id="5EX-nD-DZ4"/>
+                            <constraint firstAttribute="trailing" secondItem="AfY-Uy-Bvr" secondAttribute="trailing" constant="50" id="9qF-jN-AZl"/>
+                            <constraint firstItem="ckP-Qd-CtD" firstAttribute="top" secondItem="DtC-ZX-CBh" secondAttribute="bottom" constant="40" id="DIA-wB-Eqs"/>
+                            <constraint firstItem="AfY-Uy-Bvr" firstAttribute="leading" secondItem="L9C-TZ-oEF" secondAttribute="leading" constant="50" id="Eig-lJ-iGo"/>
+                            <constraint firstItem="AfY-Uy-Bvr" firstAttribute="top" secondItem="3RF-hR-deD" secondAttribute="bottom" constant="20" id="PU4-y3-kQf"/>
+                            <constraint firstItem="DtC-ZX-CBh" firstAttribute="top" secondItem="AfY-Uy-Bvr" secondAttribute="top" constant="25" id="XRa-se-MfQ"/>
+                            <constraint firstItem="DtC-ZX-CBh" firstAttribute="leading" secondItem="L9C-TZ-oEF" secondAttribute="leading" constant="30" id="qii-gW-Ile"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" title="Profile" id="n3h-6h-kre"/>
+                    <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+                    <size key="freeformSize" width="600" height="667"/>
+                    <connections>
+                        <outlet property="backContainerView" destination="AfY-Uy-Bvr" id="gD9-2L-kwx"/>
+                        <outlet property="containerView" destination="DtC-ZX-CBh" id="vAv-cw-eFd"/>
+                        <outlet property="descriptionLabel" destination="uco-fl-uTX" id="xv1-jl-tli"/>
+                        <outlet property="mainImageView" destination="vUU-47-C31" id="LJX-TB-H8D"/>
+                        <outlet property="subTitleLabel" destination="FlP-zQ-LdK" id="Zvt-hY-pXQ"/>
+                        <outlet property="titleLabel" destination="TVN-EM-laZ" id="dcA-nj-272"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="j3z-29-W2u" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1464" y="228"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="8Pu-sO-pRl">
+            <objects>
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="gjI-CG-tNR" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" misplaced="YES" id="SQM-De-nW5">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="olH-e2-Wwf" kind="relationship" relationship="rootViewController" id="2Rk-yL-6Uv"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="oys-FG-Vwu" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="780" y="228"/>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="Gift-Box-Logo" width="512" height="512"/>
+    </resources>
+</document>
