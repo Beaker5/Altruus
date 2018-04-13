@@ -38,4 +38,9 @@
 @dynamic fbIDAltruus;
 @dynamic tokenAltruus;
 
+@dynamic session;
+@dynamic sessionCreated;
+@dynamic sessionExpires;
+@dynamic phoneNumber;
+
 @end

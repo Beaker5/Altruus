@@ -16,7 +16,7 @@
 @protocol ExampleViewControllerDelegate <NSObject>
 
 -(void)exampleViewController:(UIViewController *)controller didFinishWithMessage:(NSString *)message andLast4:(NSString*)last4;
--(void)exampleViewController:(UIViewController *)controller didFinishWithError:(NSError *)error;
+-(void)exampleViewController:(UIViewController *)controller didFinishWithError:(NSError *)error andMessage:(NSString*)message;
 
 @end
 

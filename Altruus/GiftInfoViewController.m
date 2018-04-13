@@ -31,6 +31,8 @@
 
 @property (nonatomic, weak) IBOutlet NSLayoutConstraint *giftImageHeightConstant;
 
+@property (assign) BOOL esUsuarioAltruus;
+
 
 @end
 
@@ -112,16 +114,50 @@
     /*****************************************************************************/
     @try {
         if ([DataProvider networkConnected]) {
+            NSString *urlString = [NSString stringWithFormat:@"%@?session=%@&giftId=%@", GIFT_INFO_V3, self.localUser.session, [self.gift objectForKey:@"id"]];
+            NSURL *url = [NSURL URLWithString:urlString];
+            
+            NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url
+                                                                   cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData
+                                                               timeoutInterval:0.0];
+            NSURLResponse *response;
+            NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:nil];
+            NSDictionary *dictionary = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil]; //el json se guarda en este array
+            
+            NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
+            NSInteger codeService = [httpResponse statusCode];
+            if (codeService == 200) {
+                NSLog(@"Dictionary : %@", dictionary);
+                NSDictionary *dictStatus = [dictionary objectForKey:@"status"];
+                NSInteger code = [[dictStatus objectForKey:@"code"] integerValue];
+                if(code == 200){
+                    dictionary = [dictionary objectForKey:@"entity"];
+                    self.titleLabel.text = [dictionary objectForKey:@"name"];
+                    //self.descriptionLabel.text = [dictionary objectForKey:@"giftDescription"];
+                    self.descriptionLabel.text = [dictionary objectForKey:@"companyName"];
+                    NSString *price =  [NSString stringWithFormat:@"%@", [dictionary objectForKey:@"price"]];
+                    if([price isEqualToString:@"0.00"] || [price isEqualToString:@"0"]){
+                        price = @"FREE";
+                        self.categoryString = @"Free";
+                    }else{
+                        self.categoryString = @"Paid";
+                        price = [NSString stringWithFormat:@"$ %@", price];
+                    }
+                    self.adressLabel.text = price;
+                    
+                    self.imageView.image = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@%@",PREFIJO_PHOTO_DETALLE, [dictionary objectForKey:@"picture"]]]]];
+                    self.gift = dictionary;
+                }else{
+                    self.titleLabel.text = @"";
+                    self.descriptionLabel.text = @"";
+                    self.adressLabel.text = @"";
+                }
+            }
+            /*
             NSMutableDictionary *dict = [[NSMutableDictionary alloc]init];
             [dict setObject:self.localUser.tokenAltruus forKey:@"token"];
             [dict setObject:self.localUser.userIDAltruus forKey:@"userId"];
             [dict setObject:[self.gift objectForKey:@"id"] forKey:@"giftId"];
-            //[dict setObject:[self.gift objectForKey:@"id"] forKey:@"giftId"];
-            //ELIMINAR
-            //[dict setObject:@"3r0lgu9g49jm4ivv14cd0jnreh" forKey:@"token"];
-            //[dict setObject:@"1" forKey:@"userId"];
-            NSLog(@"UserID: %@", self.localUser.userIDAltruus);
-            NSLog(@"Token: %@", self.localUser.tokenAltruus);
             
             NSData *jsonData = [NSJSONSerialization dataWithJSONObject:dict options:0 error:nil];
             
@@ -138,9 +174,6 @@
             
             NSInteger code = [httpResponse statusCode];
             NSDictionary *dictionary = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
-            
-            //NSData *imageData = [NSData dataWithContentsOfURL:[NSURL URLWithString:[self.gift objectForKey:@"image"]]];
-            
             //self.imageView.image = [UIImage imageWithData:imageData];
             if (code == 200) {
                 self.titleLabel.text = [dictionary objectForKey:@"giftName"];
@@ -163,6 +196,7 @@
                 self.descriptionLabel.text = @"";
                 self.adressLabel.text = @"";
             }
+             */
         }else{
             UIAlertView *alert = [[UIAlertView alloc]
                                   initWithTitle:nil
@@ -229,7 +263,7 @@
         }
         [self.navigationController pushViewController:controller animated:YES];
     }else if(self.giftingAction == GiftingActionSendGift && self.vieneDeAmigos == YES){
-        //NSLog(@"CategoryString: %@", self.categoryString);
+        NSLog(@"CategoryString: %@", self.categoryString);
         
         if ([self.categoryString isEqualToString:@"Paid"]) {
             [self enviaRegaloPagado];
@@ -262,7 +296,7 @@
     }else if(self.giftingAction == GiftingActionSendGiftToOneUser) {
         //Enviar regalo desde lista de amigos
         
-        //NSLog(@"CategoryString: %@", self.categoryString);
+        NSLog(@"CategoryString: %@", self.categoryString);
         
         if ([self.categoryString isEqualToString:@"Paid"]) {
             [self enviaRegaloPagado];
@@ -316,7 +350,7 @@
 
 -(void)enviaRegaloGratis{
     NSLog(@"Phone Number: %@, Token: %@, userID: %@, giftID: %@", self.friend.phoneNumber, self.localUser.tokenAltruus, self.localUser.userIDAltruus, [self.gift objectForKey:@"id"] );
-    
+    /*
     NSMutableDictionary *dict = [[NSMutableDictionary alloc]init];
     [dict setObject:self.localUser.tokenAltruus forKey:@"token"];
     [dict setObject:self.localUser.userIDAltruus forKey:@"userId"];
@@ -341,56 +375,74 @@
     NSLog(@"-----------------------------------------------------------------------------------");
     NSLog(@"Codigo: %ld, Diccionario>>>>>>>>>>: %@", (long)code, dictionary);
     NSLog(@"-----------------------------------------------------------------------------------");
+    */
     
+    NSString *urlString = [NSString stringWithFormat:@"%@?session=%@&giftId=%@&phone=%@", SEND_FREE_GIFT_V3, self.localUser.session, [self.gift objectForKey:@"id"],self.friend.phoneNumber];
+    NSURL *url = [NSURL URLWithString:urlString];
+    NSLog(@"URL: %@", url);
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url
+                                                           cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData
+                                                       timeoutInterval:0.0];
+    NSURLResponse *response;
+    NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:nil];
+    NSDictionary *dictionary = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil]; //el json se guarda en este array
     
-    if (code != 200) {
-        UIAlertView *alert = [[UIAlertView alloc]
-                              initWithTitle:@"ERROR"
-                              message:@"Can't Send Gift"
-                              delegate:nil
-                              cancelButtonTitle:NSLocalizedString(@"OK", nil)
-                              otherButtonTitles:nil];
-        [alert show];
-        
-    }else{
-        
-        [[MZFormSheetBackgroundWindow appearance] setBackgroundBlurEffect:YES];
-        [[MZFormSheetBackgroundWindow appearance] setBlurRadius:5.0];
-        [[MZFormSheetBackgroundWindow appearance] setBackgroundColor:[UIColor altruus_duckEggBlueColor]];
-        
-        UIViewController *controller = [self.storyboard instantiateViewControllerWithIdentifier:kV2StoryboardRedeem];
-        if ([controller isKindOfClass:[RedeemGiftViewController class]]) {
-            ((RedeemGiftViewController*) controller).screenType = RedeemScreenTypeSentGift;
-        }
-        
-        MZFormSheetController *formSheet = [[MZFormSheetController alloc] initWithViewController:controller];
-        formSheet.transitionStyle = MZFormSheetTransitionStyleSlideFromTop;
-        formSheet.presentedFormSheetSize = CGSizeMake(300, 460);
-        
-        formSheet.formSheetWindow.transparentTouchEnabled = YES;
-        [formSheet presentAnimated:YES completionHandler:^(UIViewController *presentedFSViewController) {
-            //do something
-        }];
-        
-        if (![self esUsuarioAltruus:self.friend.phoneNumber]) {
-            
-            UIAlertView *alert = [[UIAlertView alloc]initWithTitle:@"Not an Altrüus user!"
-                                                           message:@"Your friend doesn't have Altrüus yet. Let them know so they can redeem their thoughtful gift!"
-                                                          delegate:self
-                                                 cancelButtonTitle:@"Cancel"
-                                                 otherButtonTitles:@"OK", nil];
-            
-            alert.tag=101;//add tag to alert
+    NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
+    NSInteger codeService = [httpResponse statusCode];
+    if (codeService == 200) {
+        NSLog(@"Dictionary : %@", dictionary);
+        NSInteger code = [[dictionary objectForKey:@"code"] integerValue];
+        if (code != 200) {
+            UIAlertView *alert = [[UIAlertView alloc]
+                                  initWithTitle:@"ERROR"
+                                  message:@"Can't Send Gift"
+                                  delegate:nil
+                                  cancelButtonTitle:NSLocalizedString(@"OK", nil)
+                                  otherButtonTitles:nil];
             [alert show];
+            
+        }else{
+            if ([self esUsuarioAltruus:self.friend.phoneNumber]) {
+                self.esUsuarioAltruus = YES;
+                [[MZFormSheetBackgroundWindow appearance] setBackgroundBlurEffect:YES];
+                [[MZFormSheetBackgroundWindow appearance] setBlurRadius:5.0];
+                [[MZFormSheetBackgroundWindow appearance] setBackgroundColor:[UIColor altruus_duckEggBlueColor]];
+                
+                UIViewController *controller = [self.storyboard instantiateViewControllerWithIdentifier:kV2StoryboardRedeem];
+                if ([controller isKindOfClass:[RedeemGiftViewController class]]) {
+                    ((RedeemGiftViewController*) controller).screenType = RedeemScreenTypeSentGift;
+                }
+                
+                MZFormSheetController *formSheet = [[MZFormSheetController alloc] initWithViewController:controller];
+                formSheet.transitionStyle = MZFormSheetTransitionStyleSlideFromTop;
+                formSheet.presentedFormSheetSize = CGSizeMake(300, 460);
+                
+                formSheet.formSheetWindow.transparentTouchEnabled = YES;
+                [formSheet presentAnimated:YES completionHandler:^(UIViewController *presentedFSViewController) {
+                    //do something
+                }];
+            }else{
+                self.esUsuarioAltruus = NO;
+                UIAlertView *alert = [[UIAlertView alloc]initWithTitle:@"Not an Altrüus user!"
+                                                               message:@"Your friend doesn't have Altrüus yet. Let them know so they can redeem their thoughtful gift!"
+                                                              delegate:self
+                                                     cancelButtonTitle:@"Cancel"
+                                                     otherButtonTitles:@"OK", nil];
+                
+                alert.tag=101;//add tag to alert
+                [alert show];
+            }
         }
-        
     }
+    
+    
 }
 
 -(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex{
     if (alertView.tag == 101) {
         if (buttonIndex == 1) {
-            NSString *inviteText = [NSString stringWithFormat:@"I just sent you a gift! Download Altrüus from the following link to redeem:"];
+            //NSString *inviteText =  [NSString stringWithFormat:@"I just sent you a gift! Download Altrüus from the following link to redeem:"];
+            NSString *inviteText = NSLocalizedString(@"I just sent you a gift! Download Altrüus from the following link to redeem:", nil);
             NSDictionary *params;
             if (self.localUser){
                 params = @{@"userID":self.localUser.userID,
@@ -404,6 +456,25 @@
                                                                                      stage:@"pre_invite"];
             UIActivityViewController *activityVC = [[UIActivityViewController alloc] initWithActivityItems:@[inviteText,itemProvider] applicationActivities:nil];
             activityVC.excludedActivityTypes = @[UIActivityTypePrint,UIActivityTypeCopyToPasteboard,UIActivityTypeSaveToCameraRoll,UIActivityTypeAddToReadingList,UIActivityTypePostToTwitter,UIActivityTypeAirDrop,@"com.tumblr.tumblr.Share-With-Tumblr",@"com.apple.mobilenotes.SharingExtension",@"com.apple.reminders.RemindersEditorExtension"];
+            [activityVC setCompletionWithItemsHandler:^(UIActivityType  _Nullable activityType, BOOL completed, NSArray * _Nullable returnedItems, NSError * _Nullable activityError) {
+                [[MZFormSheetBackgroundWindow appearance] setBackgroundBlurEffect:YES];
+                [[MZFormSheetBackgroundWindow appearance] setBlurRadius:5.0];
+                [[MZFormSheetBackgroundWindow appearance] setBackgroundColor:[UIColor altruus_duckEggBlueColor]];
+                
+                UIViewController *controller = [self.storyboard instantiateViewControllerWithIdentifier:kV2StoryboardRedeem];
+                if ([controller isKindOfClass:[RedeemGiftViewController class]]) {
+                    ((RedeemGiftViewController*) controller).screenType = RedeemScreenTypeSentGift;
+                }
+                
+                MZFormSheetController *formSheet = [[MZFormSheetController alloc] initWithViewController:controller];
+                formSheet.transitionStyle = MZFormSheetTransitionStyleSlideFromTop;
+                formSheet.presentedFormSheetSize = CGSizeMake(300, 460);
+                
+                formSheet.formSheetWindow.transparentTouchEnabled = YES;
+                [formSheet presentAnimated:YES completionHandler:^(UIViewController *presentedFSViewController) {
+                    //do something
+                }];
+            }];
             [self presentViewController:activityVC animated:YES completion:nil];
         }
     }
@@ -423,6 +494,8 @@
 -(BOOL)esUsuarioAltruus:(NSString*)phoneNumber{
     NSArray* words = [phoneNumber componentsSeparatedByCharactersInSet :[NSCharacterSet whitespaceAndNewlineCharacterSet]];
     NSString *phoneAux = [words componentsJoinedByString:@""];
+    phoneAux = [phoneAux stringByReplacingOccurrencesOfString:@"-" withString:@""];
+    
     
     if ([phoneAux length] > 10) {
         @try {
@@ -439,6 +512,30 @@
         NSManagedObjectContext *context = delegate.managedObjectContext;
         self.localUser = [User getLocalUserSesion:context];
         
+        NSString *urlString = [NSString stringWithFormat:@"%@?session=%@&phone=%@", FIND_ALTRUUS_USER_V3, self.localUser.session, phoneAux ];
+        NSURL *url = [NSURL URLWithString:urlString];
+        NSLog(@"URL: %@", urlString);
+        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url
+                                                               cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData
+                                                           timeoutInterval:0.0];
+        NSURLResponse *response;
+        NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:nil];
+        NSDictionary *dictionary = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil]; //el json se guarda en este array
+        
+        NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
+        NSInteger codeService = [httpResponse statusCode];
+        if (codeService == 200) {
+            NSLog(@"Dictionary : %@", dictionary);
+            NSDictionary *dictStatus = [dictionary objectForKey:@"status"];
+            NSInteger code = [[dictStatus objectForKey:@"code"] integerValue];
+            if(code == 200){
+                return YES;
+            }else{
+                return NO;
+            }
+        }
+        
+        /*
         NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
         [dict setObject:self.localUser.tokenAltruus forKey:@"token"];
         [dict setObject:self.localUser.userIDAltruus forKey:@"userId"];
@@ -471,6 +568,7 @@
         }else{
             return NO;
         }
+         */
 
     } @catch (NSException *exception) {
         NSLog(@"Error: %@", exception);

@@ -120,6 +120,9 @@ static NSString *const kV2StoryboardUpdates = @"updates";
 static NSString *const kV2StoryboardGiftsHome = @"giftsHome";
 static NSString *const kV2StoryboardRedeem = @"redeemGift";
 static NSString *const kV2StoryboardOrganizationProfile = @"organizationProfile";
+
+static NSString *const kV2StoryboardOrganizationProfilev2 = @"orgInfoV2";
+
 static NSString *const kV2StoryboardAbout = @"about";
 static NSString *const kV2StoryboardIntroConroller = @"introController";
 

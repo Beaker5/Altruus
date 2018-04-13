@@ -184,7 +184,8 @@ typedef NS_ENUM(NSInteger, ToggleSocial)
 
 - (IBAction)tappedInvite:(id)sender {
     //NSString *inviteText = [NSString stringWithFormat:@"I just sent you a gift! Download Altruus from the following link to redeem."];
-    NSString *inviteText = [NSString stringWithFormat:@"Become happier by becoming a giver! Download Altrüus from the following link:"];
+    //NSString *inviteText = [NSString stringWithFormat:@"Become happier by becoming a giver! Download Altrüus from the following link:"];
+    NSString *inviteText = NSLocalizedString(@"Become happier by becoming a giver! Download Altrüus from the following link:", nil);
     if (![self.localUser.userID boolValue]){
         [self showMessageWithTitle:NSLocalizedString(@"Error", nil) andMessage:NSLocalizedString(@"Please log out and then log back in to use the new invite feature!", nil)];
     }

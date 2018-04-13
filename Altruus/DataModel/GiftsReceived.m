@@ -25,4 +25,6 @@
 @dynamic image;
 @dynamic price;
 
+@dynamic redeemCode;
+
 @end

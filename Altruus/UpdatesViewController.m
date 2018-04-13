@@ -42,6 +42,8 @@
 
 @property (assign, nonatomic) BOOL esRegaloRecibido;
 
+@property (assign, nonatomic) NSInteger totalUnredeemed;
+
 // Autolayout constraints
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *segmentControlHeight;
 
@@ -67,8 +69,12 @@
     //NSLog(@"Aparece Updates");
     [self tappedHeaderSegment:self.segmentedControl];
     @try {
+        NSLog(@"Mostraré");
+        
         if ([DataProvider networkConnected]) {
-            [self actualizaNumeroRegalosRecibidos];
+            //[self grabaNotificacionesRegalosRecibidos]; //COMENTE 040118
+            [self actualizaNumeroRegalosRecibidos];     //COMENTE 040118
+            
             //[self grabaNotificacionesRegalosRecibidos];
         }else{
             UIAlertView *alert = [[UIAlertView alloc]
@@ -94,8 +100,12 @@
 -(void)actualizaNumeroRegalosRecibidos{
     UITableViewCell *cell = [self.tableview cellForRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]];
     
+    [self numeroRegalosUnredeemed];
+    
     NSString *strAux;
-    if ([self numeroRegalosUnredeemed] > 0) {
+    //if ([self numeroRegalosUnredeemed] > 0) {  //DESCOMENTE 040118
+    //if ([DataProvider numberOfGiftsUnredeemed] > 0) {  //COMENTE 040118
+    if (self.totalUnredeemed > 0) {  //DESCOMENTE 040118
         strAux = [NSString stringWithFormat:@"You have new gifts"];
     }else{
         strAux = [NSString stringWithFormat:@"You don't have new gifts"];
@@ -103,86 +113,23 @@
     ((UpdatesTableViewCell*)cell).mainLabel.text = NSLocalizedString(strAux, nil);
     
     NSString *str;
-    if ([self numeroRegalosUnredeemed] > 0) {
-        str = [NSString stringWithFormat:@"%lu items", (unsigned long)[DataProvider numberOfGiftsUnredeemed]];
+    //if ([self numeroRegalosUnredeemed] > 0) {  //DESCOMENTE 040118
+    //if ([DataProvider numberOfGiftsUnredeemed] > 0) {  //COMENTE 040118
+    if (self.totalUnredeemed > 0) {  //DESCOMENTE 040118
+        str = [NSString stringWithFormat:@"%lu items", (unsigned long)self.totalUnredeemed];
     }else{
         str = [NSString stringWithFormat:@"0 items"];
     }
     ((UpdatesTableViewCell*)cell).subLabel.text = NSLocalizedString(str, nil);
 }
 
-/*
--(void)actualizaNumeroRegalosRecibidos{
-    @try {
-        if ([DataProvider networkConnected]) {
-            NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
-            [dict setObject:self.localUser.tokenAltruus forKey:@"token"];
-            [dict setObject:self.localUser.userIDAltruus forKey:@"userId"];
-            
-            NSData *jsonData = [NSJSONSerialization dataWithJSONObject:dict options:0 error:nil];
-            NSString *jsonString;
-            if (!jsonData) {
-            } else {
-                jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-            }
-            
-            NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:RETRIEVE_USER_GIFTS]];
-            request.HTTPMethod = @"POST";
-            [request setValue:@"application/json; charset=utf-8" forHTTPHeaderField:@"Content-Type"];
-            request.HTTPBody = jsonData;
-            
-            NSURLResponse *res = nil;
-            NSError *err = nil;
-            
-            NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&res error:&err];
-            NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)res;
-            
-            NSInteger code = [httpResponse statusCode];
-            NSArray *array = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
-            if (code == 200) {
-                UITableViewCell *cell = [self.tableview cellForRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]];
-                
-                NSString *strAux;
-                if ([array count] > 0) {
-                    strAux = [NSString stringWithFormat:@"You have new gifts"];
-                }else{
-                    strAux = [NSString stringWithFormat:@"You don't have new gifts"];
-                }
-                ((UpdatesTableViewCell*)cell).mainLabel.text = NSLocalizedString(strAux, nil);
-                
-                NSString *str;
-                if ([array count] > 0) {
-                    str = [NSString stringWithFormat:@"%lu items", (unsigned long)[array count]];
-                }else{
-                    str = [NSString stringWithFormat:@"0 items"];
-                }
-                ((UpdatesTableViewCell*)cell).subLabel.text = NSLocalizedString(str, nil);
-            }
-            
-        }else{
-            UIAlertView *alert = [[UIAlertView alloc]
-                                  initWithTitle:nil
-                                  message:@"No Network Connection!"
-                                  delegate:nil
-                                  cancelButtonTitle:NSLocalizedString(@"OK", nil)
-                                  otherButtonTitles:nil];
-            [alert show];
-        }
-    } @catch (NSException *exception) {
-        UIAlertView *alert = [[UIAlertView alloc]
-                              initWithTitle:@"App Error"
-                              message:exception.reason
-                              delegate:nil
-                              cancelButtonTitle:NSLocalizedString(@"OK", nil)
-                              otherButtonTitles:nil];
-        [alert show];
-    }
-}
-*/
+
 -(void)setup{
     //self.segmentControlHeight.constant = 0;
     self.dataUpdates = [NSArray new];
     self.dataGiftsToUser = [NSArray new];
+    
+    self.totalUnredeemed = 0;
     
     self.segmentedControl.selectedSegmentIndex = 1;
     self.updateType = UpdateTypeYou;
@@ -218,20 +165,7 @@
     self.localUser = [User getLocalUserSesion:context];
     
     @try {
-        if ([DataProvider networkConnected]) {
-            [self grabaNotificacionesCoreData];
-            //[self grabaNotificacionesRegalosRecibidos];
-            //[self notificacionesRegalosRecibidos];
-            [self notificacionesRegalosEnviados];
-        }else{
-            UIAlertView *alert = [[UIAlertView alloc]
-                                  initWithTitle:nil
-                                  message:@"No Network Connection!"
-                                  delegate:nil
-                                  cancelButtonTitle:NSLocalizedString(@"OK", nil)
-                                  otherButtonTitles:nil];
-            [alert show];
-        }
+        
     } @catch (NSException *exception) {
         UIAlertView *alert = [[UIAlertView alloc]
                               initWithTitle:@"App Error"
@@ -245,47 +179,31 @@
 }
 
 
--(NSInteger)numeroRegalosUnredeemed{
-    NSInteger contador = 0;
+-(void)numeroRegalosUnredeemed{
+    //NSInteger contador = 0;
+    //NSInteger total = 0;
     //NSLog(@"Se ejecuta el grabado");
     if ([DataProvider networkConnected]) {
-        //AppDelegate *delegate = [AppDelegate sharedAppDelegate];
-        //NSManagedObjectContext *managedContext = delegate.managedObjectContext;
-        //[DataProvider deleteGiftsReceived];
+        NSString *urlString = [NSString stringWithFormat:@"%@?session=%@&status=unredeemed&size=1&page=1", RETRIEVE_USER_GIFTS_V3, self.localUser.session ];
+        NSURL *url = [NSURL URLWithString:urlString];
+        NSLog(@"URL: %@", urlString);
+        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url
+                                                               cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData
+                                                           timeoutInterval:0.0];
+        NSURLResponse *response;
+        NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:nil];
+        NSDictionary *dictionary = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil]; //el json se guarda en este array
         
-        NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
-        [dict setObject:self.localUser.tokenAltruus forKey:@"token"];
-        [dict setObject:self.localUser.userIDAltruus forKey:@"userId"];
-        
-        NSData *jsonData = [NSJSONSerialization dataWithJSONObject:dict options:0 error:nil];
-        NSString *jsonString;
-        if (!jsonData) {
-        } else {
-            jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+        NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
+        NSInteger codeService = [httpResponse statusCode];
+        if (codeService == 200) {
+            NSLog(@"Dictionary : %@", dictionary);
+            //NSDictionary *dictStatus = [dictionary objectForKey:@"status"];
+            //NSInteger code = [[dictStatus objectForKey:@"code"] integerValue];
+            self.totalUnredeemed = [[dictionary objectForKey:@"totalResultsFound"] integerValue];
+            
         }
         
-        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:RETRIEVE_USER_GIFTS]];
-        request.HTTPMethod = @"POST";
-        [request setValue:@"application/json; charset=utf-8" forHTTPHeaderField:@"Content-Type"];
-        request.HTTPBody = jsonData;
-        
-        NSURLResponse *res = nil;
-        NSError *err = nil;
-        
-        NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&res error:&err];
-        NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)res;
-        
-        NSInteger code = [httpResponse statusCode];
-        NSArray *array = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
-        
-        if (code == 200) {
-            for (NSDictionary *dictionary in array) {
-                //NSLog(@"%@",[dictionary objectForKey:@"status"]);
-                if ([[dictionary objectForKey:@"status"] isEqualToString:@"UNREDEEMED"]) {
-                    contador++;
-                }
-            }
-        }
         
     }else{
         UIAlertView *alert = [[UIAlertView alloc]
@@ -297,7 +215,7 @@
         [alert show];
         
     }
-    return contador;
+    //return total;
 }
 
 -(void)grabaNotificacionesRegalosRecibidos{
@@ -307,54 +225,46 @@
         NSManagedObjectContext *managedContext = delegate.managedObjectContext;
         
         [DataProvider deleteGiftsReceived];
+        NSString *urlString = [NSString stringWithFormat:@"%@?session=%@", RETRIEVE_USER_GIFTS_V3, self.localUser.session ];
+        NSURL *url = [NSURL URLWithString:urlString];
+        NSLog(@"URL: %@", urlString);
+        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url
+                                                               cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData
+                                                           timeoutInterval:0.0];
+        NSURLResponse *response;
+        NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:nil];
+        NSDictionary *dictionary = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil]; //el json se guarda en este array
         
-        NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
-        [dict setObject:self.localUser.tokenAltruus forKey:@"token"];
-        [dict setObject:self.localUser.userIDAltruus forKey:@"userId"];
-        
-        NSData *jsonData = [NSJSONSerialization dataWithJSONObject:dict options:0 error:nil];
-        NSString *jsonString;
-        if (!jsonData) {
-        } else {
-            jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-        }
-        
-        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:RETRIEVE_USER_GIFTS]];
-        request.HTTPMethod = @"POST";
-        [request setValue:@"application/json; charset=utf-8" forHTTPHeaderField:@"Content-Type"];
-        request.HTTPBody = jsonData;
-        
-        NSURLResponse *res = nil;
-        NSError *err = nil;
-        
-        NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&res error:&err];
-        NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)res;
-        
-        NSInteger code = [httpResponse statusCode];
-        NSArray *array = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
-        //NSLog(@"-----------------------------------------------------------------------------------");
-        //NSLog(@"Codigo: %ld, Diccionario Usuario: %@, Contador: %lu", (long)code, array, (unsigned long)[array count]);
-        //NSLog(@"-----------------------------------------------------------------------------------");
-        if (code == 200) {
-            for (NSDictionary *dictionary in array) {
-                GiftsReceived * gift = [NSEntityDescription insertNewObjectForEntityForName:@"GiftsReceived" inManagedObjectContext:managedContext];
-                gift.date =  [NSString stringWithFormat:@"%@",[dictionary objectForKey:@"datetime"]];
-                gift.giftCode = [NSString stringWithFormat:@"%@",[dictionary objectForKey:@"giftCode"]];
-                gift.giftName = [dictionary objectForKey:@"giftName"];
-                gift.idGift = [NSString stringWithFormat:@"%@",[dictionary objectForKey:@"id"]];
-                gift.image = [dictionary objectForKey:@"picture"];
-                gift.merchantName = [dictionary objectForKey:@"merchantName"];
-                gift.senderName = [dictionary objectForKey:@"senderName"];
-                gift.senderPicture = [dictionary objectForKey:@"senderPicture"];
-                gift.status = [dictionary objectForKey:@"status"];
-                
-                NSError *error;
-                if (![managedContext save:&error]) {
-                    NSLog(@"Error Para Guardar: %@", [error localizedDescription]);
+        NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
+        NSInteger codeService = [httpResponse statusCode];
+        if (codeService == 200) {
+            NSLog(@"Dictionary : %@", dictionary);
+            NSDictionary *dictStatus = [dictionary objectForKey:@"status"];
+            NSInteger code = [[dictStatus objectForKey:@"code"] integerValue];
+            if(code == 200){
+                NSArray *array = [dictionary objectForKey:@"results"];
+                NSLog(@"Array: %@", array);
+                for(NSDictionary *dict in array){
+                    GiftsReceived * gift = [NSEntityDescription insertNewObjectForEntityForName:@"GiftsReceived" inManagedObjectContext:managedContext];
+                    gift.date =  [NSString stringWithFormat:@"%@",[dict objectForKey:@"createdAt"]];
+                    gift.giftCode = [NSString stringWithFormat:@"%@",[dict objectForKey:@"giftCode"]];
+                    gift.giftName = [dict objectForKey:@"giftName"];
+                    gift.idGift = [NSString stringWithFormat:@"%@",[dict objectForKey:@"id"]];
+                    gift.image = [dict objectForKey:@"giftPicture"];
+                    gift.merchantName = [dict objectForKey:@"merchantName"];
+                    gift.senderName = [dict objectForKey:@"senderName"];
+                    gift.senderPicture = [dict objectForKey:@"senderPicture"];
+                    gift.status = [dict objectForKey:@"status"];
+                    gift.price =  [NSString stringWithFormat:@"%@",[dict objectForKey:@"price"]];
+                    gift.redeemCode = [NSString stringWithFormat:@"%@",[dict objectForKey:@"redeemCode"]];
+                    
+                    NSError *error;
+                    if (![managedContext save:&error]) {
+                        NSLog(@"Error Para Guardar: %@", [error localizedDescription]);
+                    }
+                    
                 }
-                
             }
-            
         }
         
     }else{
@@ -385,79 +295,44 @@
         [dateFormat setDateFormat:@"dd/MM/yyyy hh:mma"];
         NSString *dateString = [dateFormat stringFromDate:date];
         
+        
+        NSArray *array = [dateString componentsSeparatedByString:@" "];
+        NSString *dateOriginal, *hourOriginal;
+        @try {
+            dateOriginal = [array objectAtIndex:0];
+            hourOriginal = [array objectAtIndex:1];
+        } @catch (NSException *exception) {
+            
+        }
+        
+        NSArray *dateSeparate = [dateOriginal componentsSeparatedByString:@"/"];
+        NSString *fechaFinal;
+        
+        NSDateFormatter *df = [[NSDateFormatter alloc] init];
+        [df setLocale:[NSLocale currentLocale]];
+        NSArray *months = [df monthSymbols];
+        NSInteger mes = [[dateSeparate objectAtIndex:1] integerValue];
+        NSInteger dia = [[dateSeparate objectAtIndex:0] integerValue];
+        
+        fechaFinal = [NSString stringWithFormat:@"%@ %ld %@ %@m.", [[months objectAtIndex:mes-1] capitalizedString], (long)dia, [dateSeparate objectAtIndex:2], hourOriginal];
+        
+        
         dict = @{@"title": [NSString stringWithFormat:@"%@ sent you %@ from %@", gift.senderName, gift.giftName, gift.merchantName],
-                 @"date":dateString,
+                 //@"date":dateString,
+                 @"date":fechaFinal,
+                 @"dateO":dateString,
                  @"giftName":gift.giftName,
                  @"merchantName":gift.merchantName,
                  @"giftCode":gift.giftCode,
                  @"id":gift.idGift,
                  @"senderPicture":gift.senderPicture,
                  @"status":gift.status,
+                 @"redeemCode":gift.redeemCode,
                  @"image":gift.image};
         [arrayAux addObject:dict];
     }
     self.dataGiftsToUser = arrayAux;
-    /*
-    self.dataGiftsToUser = [NSArray new];
-    
-    NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
-    [dict setObject:self.localUser.tokenAltruus forKey:@"token"];
-    [dict setObject:self.localUser.userIDAltruus forKey:@"userId"];
-    
-    
-    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:dict options:0 error:nil];
-    NSString *jsonString;
-    if (!jsonData) {
-    } else {
-        jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-    }
-    
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:RETRIEVE_USER_GIFTS]];
-    request.HTTPMethod = @"POST";
-    [request setValue:@"application/json; charset=utf-8" forHTTPHeaderField:@"Content-Type"];
-    request.HTTPBody = jsonData;
-    
-    NSURLResponse *res = nil;
-    NSError *err = nil;
-    
-    NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&res error:&err];
-    NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)res;
-    
-    NSInteger code = [httpResponse statusCode];
-    NSArray *array = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
-    //NSLog(@"-----------------------------------------------------------------------------------");
-    //NSLog(@"Codigo: %ld, Diccionario Usuario: %@, Contador: %lu", (long)code, array, (unsigned long)[array count]);
-    //NSLog(@"-----------------------------------------------------------------------------------");
-    if (code == 200) {
-        NSMutableArray *arrayAux = [NSMutableArray new];
-        NSDictionary *dict;
-        NSString *datetime;
-        for (NSDictionary *dictionary in array) {
-            datetime = [dictionary objectForKey:@"datetime"];
-            double getDate = [datetime doubleValue];
-            NSTimeInterval seconds = getDate / 1000;
-            NSDate *date = [NSDate dateWithTimeIntervalSince1970:seconds];
-            NSDateFormatter *dateFormat = [[NSDateFormatter alloc] init];
-            [dateFormat setDateFormat:@"dd/MM/yyyy hh:mma"];
-            NSString *dateString = [dateFormat stringFromDate:date];
-            
-            //NSLog(@"Image: %@", [dictionary objectForKey:@"picture"] );
-            dict = @{@"title": [NSString stringWithFormat:@"%@ sent you %@ from %@", [dictionary objectForKey:@"senderName"], [dictionary objectForKey:@"giftName"], [dictionary objectForKey:@"merchantName"]],
-                     @"date":dateString,
-                     @"giftName":[dictionary objectForKey:@"giftName"],
-                     @"merchantName":[dictionary objectForKey:@"merchantName"],
-                     @"giftCode":[dictionary objectForKey:@"giftCode"],
-                     @"id":[dictionary objectForKey:@"id"],
-                     @"senderPicture":[dictionary objectForKey:@"senderPicture"],
-                     @"status":[dictionary objectForKey:@"status"],
-                     @"image":[dictionary objectForKey:@"picture"]};
-            [arrayAux addObject:dict];
-            
-        }
-        self.dataGiftsToUser = arrayAux;
-        //NSLog(@"GiftsToUser: %@", self.dataGiftsToUser);
-    }
-     */
+
 }
 
 -(void)grabaNotificacionesCoreData{
@@ -606,9 +481,29 @@
                     NSString *dateString = [dateFormat stringFromDate:date];
                     //NSLog(@"date: %@", dateString);
                     
+                    NSArray *array = [dateString componentsSeparatedByString:@" "];
+                    NSString *dateOriginal, *hourOriginal;
+                    @try {
+                        dateOriginal = [array objectAtIndex:0];
+                        hourOriginal = [array objectAtIndex:1];
+                    } @catch (NSException *exception) {
+                        
+                    }
+                    
+                    NSArray *dateSeparate = [dateOriginal componentsSeparatedByString:@"/"];
+                    NSString *fechaFinal;
+                    
+                    NSDateFormatter *df = [[NSDateFormatter alloc] init];
+                    [df setLocale:[NSLocale currentLocale]];
+                    NSArray *months = [df monthSymbols];
+                    NSInteger mes = [[dateSeparate objectAtIndex:1] integerValue];
+                    NSInteger dia = [[dateSeparate objectAtIndex:0] integerValue];
+                    
+                    fechaFinal = [NSString stringWithFormat:@"%@ %ld %@ %@m.", [[months objectAtIndex:mes-1] capitalizedString], (long)dia, [dateSeparate objectAtIndex:2], hourOriginal];
+                    
                     
                     dict = @{@"title": [NSString stringWithFormat:@"%@ sent you %@ from %@", userFrom, giftName, merchantName],
-                             @"date":dateString,
+                             @"date":fechaFinal,
                              @"type":pictureType,
                              @"image":picture};
                     [arrayAux addObject:dict];
@@ -622,8 +517,28 @@
                     NSString *dateString = [dateFormat stringFromDate:date];
                     //NSLog(@"date: %@", dateString);
                     
+                    NSArray *array = [dateString componentsSeparatedByString:@" "];
+                    NSString *dateOriginal, *hourOriginal;
+                    @try {
+                        dateOriginal = [array objectAtIndex:0];
+                        hourOriginal = [array objectAtIndex:1];
+                    } @catch (NSException *exception) {
+                        
+                    }
+                    
+                    NSArray *dateSeparate = [dateOriginal componentsSeparatedByString:@"/"];
+                    NSString *fechaFinal;
+                    
+                    NSDateFormatter *df = [[NSDateFormatter alloc] init];
+                    [df setLocale:[NSLocale currentLocale]];
+                    NSArray *months = [df monthSymbols];
+                    NSInteger mes = [[dateSeparate objectAtIndex:1] integerValue];
+                    NSInteger dia = [[dateSeparate objectAtIndex:0] integerValue];
+                    
+                    fechaFinal = [NSString stringWithFormat:@"%@ %ld %@ %@m.", [[months objectAtIndex:mes-1] capitalizedString], (long)dia, [dateSeparate objectAtIndex:2], hourOriginal];
+                    
                     dict = @{@"title": [NSString stringWithFormat:@"You sent %@ to %@ from %@", giftName, userTo, merchantName],
-                             @"date": dateString,
+                             @"date": fechaFinal,
                              @"type":pictureType,
                              @"image":picture};
                     [arrayAux addObject:dict];
@@ -640,124 +555,7 @@
     self.dataUpdates = arrayAux;
 }
 
-/*
--(void)notificacionesRegalosEnviados{
-    self.dataUpdates = [NSArray new];
-    
-    NSString *url = @"";
-    switch (self.updateType) {
-        case UpdateTypeFriends:
-            url = UPDATES_FRIENDS;
-            break;
-        case UpdateTypeYou:
-            url = UPDATES_USER;
-            break;
-        case UpdateTypeCompany:
-            url = UPDATES_COMPANY;
-            break;
-        default:
-            break;
-    }
-    
-    
-    NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
-    [dict setObject:self.localUser.tokenAltruus forKey:@"token"];
-    [dict setObject:self.localUser.userIDAltruus forKey:@"userId"];
-    //[dict setObject:@"12hnnatlu3v3e3jbtm0unjdso9" forKey:@"token"];
-    //[dict setObject:@"345" forKey:@"userId"];
-    //ELIMINAR
-    //[dict setObject:@"3r0lgu9g49jm4ivv14cd0jnreh" forKey:@"token"];
-    //[dict setObject:@"1" forKey:@"userId"];
-    
-    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:dict options:0 error:nil];
-    NSString *jsonString;
-    if (!jsonData) {
-    } else {
-        jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-    }
-    
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:url]];
-    request.HTTPMethod = @"POST";
-    [request setValue:@"application/json; charset=utf-8" forHTTPHeaderField:@"Content-Type"];
-    request.HTTPBody = jsonData;
-    
-    NSURLResponse *res = nil;
-    NSError *err = nil;
-    
-    NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&res error:&err];
-    NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)res;
-    
-    NSInteger code = [httpResponse statusCode];
-    NSArray *array = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
-    //NSLog(@"-----------------------------------------------------------------------------------");
-    NSLog(@"Codigo: %ld, Diccionario Updates: %@, %@", (long)code, array, httpResponse);
-    //NSLog(@"-----------------------------------------------------------------------------------");
-    if (code == 200) {
-        NSMutableArray *arrayAux = [NSMutableArray new];
-        NSDictionary *dict;
-        NSString *giftName, *merchantName, *userFrom, *userTo, *picture, *pictureType, *datetime;
-        for (NSDictionary *dictionary in array) {
-            giftName = [dictionary objectForKey:@"giftName"];
-            merchantName = [dictionary objectForKey:@"merchantName"];
-            userFrom = [dictionary objectForKey:@"userFrom"];
-            userTo = [dictionary objectForKey:@"userTo"];
-            picture = [dictionary objectForKey:@"picture"];
-            pictureType = [dictionary objectForKey:@"pictureType"];
-            datetime = [dictionary objectForKey:@"datetime"];
-            switch (self.updateType) {
-                case UpdateTypeFriends:
-                    dict = [NSDictionary new];
-                    break;
-                case UpdateTypeYou:{
-                    
-                    if ([userTo isEqualToString:@"you"]) {
-                        //Regalos recibidos
-                        double getDate = [datetime doubleValue];
-                        NSTimeInterval seconds = getDate / 1000;
-                        NSDate *date = [NSDate dateWithTimeIntervalSince1970:seconds];
-                        NSDateFormatter *dateFormat = [[NSDateFormatter alloc] init];
-                        [dateFormat setDateFormat:@"dd/MM/yyyy hh:mma"];
-                        NSString *dateString = [dateFormat stringFromDate:date];
-                        //NSLog(@"date: %@", dateString);
-                        
-                        
-                        dict = @{@"title": [NSString stringWithFormat:@"%@ sent you %@ from %@", userFrom, giftName, merchantName],
-                                 @"date":dateString,
-                                 @"type":pictureType,
-                                 @"image":picture};
-                        [arrayAux addObject:dict];
-                    }else if ([userFrom isEqualToString:@"you"]) {
-                        //Regalos enviados
-                        double getDate = [datetime doubleValue];
-                        NSTimeInterval seconds = getDate / 1000;
-                        NSDate *date = [NSDate dateWithTimeIntervalSince1970:seconds];
-                        NSDateFormatter *dateFormat = [[NSDateFormatter alloc] init];
-                        [dateFormat setDateFormat:@"dd/MM/yyyy hh:mma"];
-                        NSString *dateString = [dateFormat stringFromDate:date];
-                        //NSLog(@"date: %@", dateString);
-                        
-                        dict = @{@"title": [NSString stringWithFormat:@"You sent %@ to %@ from %@", giftName, userTo, merchantName],
-                                 @"date": dateString,
-                                 @"type":pictureType,
-                                 @"image":picture};
-                        [arrayAux addObject:dict];
-                    }
-                }
-                    break;
-                case UpdateTypeCompany:
-                    dict = [NSDictionary new];
-                    break;
-                default:
-                    break;
-            }
-            
-        }
-        self.dataUpdates = arrayAux;
-        //NSLog(@"dataUpdates: %@", self.dataUpdates);
-    }
-    
-}
-*/
+
 
 -(void)goBack{
     [self dismissViewControllerAnimated:YES completion:nil];
@@ -814,30 +612,12 @@
 
 #pragma -mark Tableview Datasource and Delegate
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView{
-    //COMENTÈ
-    /*
-    if ([self.dataGiftsToUser count] > 0) {
-        return 2;
-    }else{
-        return 1;
-    }
-     */
+    
     return 2;
 }
 
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
-    //COMENTÉ
-    /*
-    if ([self.dataGiftsToUser count] > 0) {
-        if (section == 0) {
-            return 1;
-        }else{
-            return [self.data count];
-        }
-    }else{
-        return [self.data count];
-    }
-     */
+    
     if (section == 0) {
         return 1;
     }else{
@@ -876,18 +656,7 @@
 }
 
 -(NSString*)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section{
-    //COMENTÉ
-    /*
-    if ([self.dataGiftsToUser count] > 0) {
-        if (section == 0) {
-            return NSLocalizedString(@"RECENT", nil);
-        }else{
-            return NSLocalizedString(@"PREVIOUS", nil);
-        }
-    }else{
-        return NSLocalizedString(@"RECENT", nil);
-    }
-     */
+   
     if (section == 0) {
         return NSLocalizedString(@"RECENT", nil);
     }else{
@@ -917,8 +686,9 @@
         cell.userInteractionEnabled = YES;
         
         NSString *strAux;
-        //if ([self.dataGiftsToUser count] > 0) {
-        if ([self numeroRegalosUnredeemed] > 0) {
+        //if ([DataProvider numberOfGiftsUnredeemed] > 0) {  //COMENTE 040118
+        //if ([self numeroRegalosUnredeemed] > 0) {  //DESCOMENTE
+        if (self.totalUnredeemed > 0) {  //DESCOMENTE
             strAux = [NSString stringWithFormat:@"You have new gifts"];
         }else{
             strAux = [NSString stringWithFormat:@"You don't have new gifts"];
@@ -926,8 +696,10 @@
         ((UpdatesTableViewCell*)cell).mainLabel.text = NSLocalizedString(strAux, nil);
         
         NSString *str;
-        if ([self numeroRegalosUnredeemed] > 0) {
-            str = [NSString stringWithFormat:@"%lu items", (unsigned long)[DataProvider numberOfGiftsUnredeemed]];
+      
+        if (self.totalUnredeemed > 0) {  //DESCOMENTE 040118
+            //str = [NSString stringWithFormat:@"%lu items", (unsigned long)[DataProvider numberOfGiftsUnredeemed]]; //COMENTE 040118
+            str = [NSString stringWithFormat:@"%lu items", (unsigned long)self.totalUnredeemed]; //AGREGUE 040118
         }else{
             str = [NSString stringWithFormat:@"0 items"];
         }
@@ -959,15 +731,7 @@
         
         ((UpdatesTableViewCell*)cell).mainLabel.text = title;
         ((UpdatesTableViewCell*)cell).subLabel.text = date;
-        /*
-        if (self.updateType == UpdateTypeYou && indexPath.section == 0) {
-            ((UpdatesTableViewCell*)cell).imageView.image = image;
-        }else{
-            ((UpdatesTableViewCell*)cell).imageView.image = image;
-        }
-        ((UpdatesTableViewCell*)cell).imageView.contentMode = UIViewContentModeScaleAspectFit;
-        ((UpdatesTableViewCell*)cell).imageView.clipsToBounds = YES;
-         */
+       
         ((UpdatesTableViewCell*)cell).imageView.image = image;
         ((UpdatesTableViewCell*)cell).imageView.contentMode = UIViewContentModeScaleAspectFit;
         ((UpdatesTableViewCell*)cell).imageView.clipsToBounds = YES;

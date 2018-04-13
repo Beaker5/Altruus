@@ -19,5 +19,6 @@
 @dynamic photo;
 @dynamic idO;
 @dynamic origin;
+@dynamic idString;
 
 @end

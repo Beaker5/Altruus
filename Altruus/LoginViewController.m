@@ -160,15 +160,7 @@ typedef NS_ENUM(NSInteger, LoginFieldType)
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
-/*
-#pragma mark - Navigation
 
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-*/
 
 -(void)setupRegister{
     @try {
@@ -227,8 +219,6 @@ typedef NS_ENUM(NSInteger, LoginFieldType)
         self.bottomTextTopspaceConstraint.constant = 15;
     }
     
-    //NSDictionary *info = [[NSBundle mainBundle] infoDictionary]; //COMENTE 250617
-    //NSString *version = info[@"CFBundleShortVersionString"]; //COMENTE 250617
     self.bottomLabel.text = NSLocalizedString(@"Don't have an account yet?", nil);
     [self.bottomSignUp setTitle:NSLocalizedString(@"Sign Up", nil) forState:UIControlStateNormal];
     //self.versionLabel.text = [NSString stringWithFormat:@"Altruus v%@",version];
@@ -360,17 +350,6 @@ typedef NS_ENUM(NSInteger, LoginFieldType)
 
     DLog(@"Tapped sign up");
     
-    /*
-    UIViewController *signup = [self.storyboard instantiateViewControllerWithIdentifier:kStoryboardSignup];
-    if (signup){
-        ((SignupController *)signup).localUser = self.localUser;
-        ((SignupController *)signup).userCountry = self.userCountry;
-        //((SignupController *)signup).delegate = self.baseProfile;
-        [self.navigationController pushViewController:signup animated:YES];
-    }
-     */
-    
-    
 }
 
 -(BOOL)checkFields
@@ -482,11 +461,6 @@ typedef NS_ENUM(NSInteger, LoginFieldType)
 {
     if (self.facebookIsLoggingIn){
         
-        //self.hud = [MBProgressHUD showHUDAddedTo:self.view animated:YES];
-        //self.hud.mode = MBProgressHUDModeIndeterminate;
-        //self.hud.labelText = NSLocalizedString(@"Logging In..", nil);
-        
-        NSLog(@"Sender: %@", notif.object);
         
         EasyFacebook *sender = notif.object;
         NSString *firstname = sender.UserFirstName;
@@ -532,7 +506,6 @@ typedef NS_ENUM(NSInteger, LoginFieldType)
         
         AppDelegate *delegate = [AppDelegate sharedAppDelegate];
         NSString *pushId = delegate.pushId;
-        //pushId = @"8278-2335-gdfg-335"; //ELIMINAR PUSHID
        
         //[User registerWithParams:data block:^(APIRequestStatus status, NSString *userToken, NSDictionary *userData) {
             //if (status == APIRequestStatusSuccess){
@@ -549,49 +522,9 @@ typedef NS_ENUM(NSInteger, LoginFieldType)
             
                 self.localUser.pushID = pushId;
                 [self signInFacebook:pushId andMail:email andFirstName:firstname andLastName:lastname andCountry:self.userCountry andFacebookId:fbuserid];
-                /*
-                self.localUser.fbIDAltruus = _fbID;
-                self.localUser.userIDAltruus = _idAltruus;
-                self.localUser.tokenAltruus = _token;
-                self.localUser.userID = [NSNumber numberWithInteger:[_idAltruus integerValue]];
-                [[NSNotificationCenter defaultCenter] postNotificationName:kUserIDSetNotification object:self userInfo:@{@"localuserID":_idAltruus}];
-                if (_token){
-                    [self saveLocalUserToken:_token];
-                }
-                //[[NSNotificationCenter defaultCenter] postNotificationName:kUserIDSetNotification object:self userInfo:@{@"localuserID":userData[@"user"][@"id"]}];
-                
-                //if (userToken){
-                //    [self saveLocalUserToken:userToken];
-                //}
-                [self.localUser.managedObjectContext save:nil];
-                
-                if ([self.delegate respondsToSelector:@selector(controller:loggedInUser:)]){
-                    [self.delegate controller:self loggedInUser:self.localUser];
-                }
-                
-                [self dismissViewControllerAnimated:YES completion:^{
-                    [[NSNotificationCenter defaultCenter] postNotificationName:kUserIDSetNotification object:self userInfo:@{@"localuserID":_idAltruus}];
-                  }];
-                 
-                 */
-                //[[NSNotificationCenter defaultCenter] postNotificationName:kUserIDSetNotification object:self userInfo:@{@"localuserID":userData[@"user"][@"id"]}];
-                //}];
-           // }
-            //else{
-            //    [self.hud hide:YES];
-            //    [self showRegisterError];
-            //}
-       // }];
     }
     
-    /*
-    CODefaultsHelper *helper = [CODefaultsHelper new];
-    if (![helper isLoggedIn]){
-        [helper toggleLoggedIn];
-        [helper removeFirstLogin];
-    }
-
-     */
+    
 }
 
 -(NSInteger)returnCountryCode:(NSString*)country{
@@ -617,9 +550,6 @@ typedef NS_ENUM(NSInteger, LoginFieldType)
     [dict setObject:email forKey:@"email"];
     [dict setObject:@"2" forKey:@"deviceTypeId"];
     [dict setObject:@"imei_123" forKey:@"imei"];
-    //[dict setObject:@"1dd608f2-c6a1-11e3-851d-000c2940e62c" forKey:@"pushId"];
-    //[dict setObject:@"john@email.com" forKey:@"email"];
-    //[dict setObject:@"hLd2KmCZifCbkbmaj6iokQ==" forKey:@"password"];
     NSLog(@"Dict: %@", dict);
     
     NSData *jsonData = [NSJSONSerialization dataWithJSONObject:dict options:0 error:nil];
@@ -645,6 +575,11 @@ typedef NS_ENUM(NSInteger, LoginFieldType)
     NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)res;
     
     NSInteger code = [httpResponse statusCode];
+        
+        
+        /**************
+         
+         *************/
     
     //NSLog(@"Res: %ld, Data: %@", code, dictionary);
     switch (code) {
@@ -666,11 +601,7 @@ typedef NS_ENUM(NSInteger, LoginFieldType)
             if (_token){
                 [self saveLocalUserToken:_token];
             }
-            //[[NSNotificationCenter defaultCenter] postNotificationName:kUserIDSetNotification object:self userInfo:@{@"localuserID":userData[@"user"][@"id"]}];
             
-            //if (userToken){
-            //    [self saveLocalUserToken:userToken];
-            //}
             [self.localUser.managedObjectContext save:nil];
             
             if ([self.delegate respondsToSelector:@selector(controller:loggedInUser:)]){
@@ -693,66 +624,6 @@ typedef NS_ENUM(NSInteger, LoginFieldType)
             self.countryPicker.hidden = NO;
             self.registerButton.hidden = NO;
             
-            
-            
-            //UIStoryboard *sb = [UIStoryboard storyboardWithName:@"intro" bundle:nil];
-            //controller = [sb instantiateViewControllerWithIdentifier:@"register"];
-            //((RegisterViewController*)controller).localUser = self.localUser;
-            //[self presentViewController:controller animated:NO completion:nil];
-            //[self dismissViewControllerAnimated:YES completion:nil];
-            
-            /*
-            dict = [[NSMutableDictionary alloc]init];
-            NSInteger countryCode = [self returnCountryCode:country];
-            [dict setObject:[NSNumber numberWithInteger:countryCode] forKey:@"countryId"];
-            [dict setObject:@"01/01/1990" forKey:@"birthday"];
-            [dict setObject:email forKey:@"email"];
-            [dict setObject:fbuserid forKey:@"facebookId"];
-            [dict setObject:firstname forKey:@"firstName"];
-            [dict setObject:lastname forKey:@"lastName"];
-            
-            jsonData = [NSJSONSerialization dataWithJSONObject:dict options:0 error:nil];
-            request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:FACEBOOK_SIGN_UP]];
-            
-            request.HTTPMethod = @"POST";
-            [request setValue:@"application/json; charset=utf-8" forHTTPHeaderField:@"Content-Type"];
-            request.HTTPBody = jsonData;
-            
-            data = [NSURLConnection sendSynchronousRequest:request returningResponse:&res error:&err];
-            httpResponse = (NSHTTPURLResponse *)res;
-            
-            NSInteger code2 = [httpResponse statusCode];
-            if(code2 == 200){
-                dict = [[NSMutableDictionary alloc]init];
-                [dict setObject:pushID forKey:@"pushId"];
-                [dict setObject:email forKey:@"email"];
-                [dict setObject:@"2" forKey:@"deviceTypeId"];
-                [dict setObject:@"imei_123" forKey:@"imei"];
-                [dict setObject:@"hLd2KmCZifCbkbmaj6iokQ==" forKey:@"password"];
-                
-                jsonData = [NSJSONSerialization dataWithJSONObject:dict options:0 error:nil];
-                request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:FACEBOOK_SIGN_IN]];
-                
-                request.HTTPMethod = @"POST";
-                [request setValue:@"application/json; charset=utf-8" forHTTPHeaderField:@"Content-Type"];
-                request.HTTPBody = jsonData;
-                
-                data = [NSURLConnection sendSynchronousRequest:request returningResponse:&res error:&err];
-                httpResponse = (NSHTTPURLResponse *)res;
-                code2 = [httpResponse statusCode];
-                if (code2 == 200) {
-                    NSDictionary *dictionary = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
-                    _fbID = [dictionary objectForKey:@"facebookId"];
-                    _idAltruus = [dictionary objectForKey:@"id"];
-                    _token = [dictionary objectForKey:@"token"];
-                }else{
-                    _fbID = @"";
-                    _idAltruus = @"";
-                    _token = @"";
-                    
-                }
-            }
-            */
             break;
         }
         default:
@@ -762,20 +633,6 @@ typedef NS_ENUM(NSInteger, LoginFieldType)
     } @catch (NSException *exception) {
         NSLog(@"Error Loginviewcontroller: %@", exception.reason);
     }
-    /*
-    NSOperationQueue *queue = [[NSOperationQueue alloc] init];
-    [NSURLConnection sendAsynchronousRequest:request queue:queue completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
-        NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *) response;
-        NSLog(@"response status code: %ld", (long)[httpResponse statusCode]);
-        NSLog(@"Response: %@",[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);
-        
-        NSDictionary *dictionary = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil]; //el json se guarda en este array
-        
-        NSLog(@"Dictionary: %@",dictionary);
-        
-        // do stuff
-    }];
-     */
 }
 
 - (IBAction)tappedRegister:(UIButton *)sender {
@@ -847,109 +704,6 @@ typedef NS_ENUM(NSInteger, LoginFieldType)
     }
 }
 
-/*
--(NSInteger)signInFacebook:(NSString*)pushID andMail:(NSString*)email{
-    NSString *url = @"http://138.197.95.215:8080/altruus-v2-authentication/api/v2/consumer/facebook_sign_in";
- 
-    NSMutableDictionary *dict = [[NSMutableDictionary alloc]init];
- 
-    [dict setObject:pushID forKey:@"pushId"];
-    [dict setObject:@"2" forKey:@"deviceTypeId"];
-    [dict setObject:email forKey:@"email"];
-    [dict setObject:@"imei_123" forKey:@"imei"];
-    [dict setObject:@"hLd2KmCZifCbkbmaj6iokQ==" forKey:@"password"];
-    
-    [dict setObject:@"1dd608f2-c6a1-11e3-851d-000c2940e62c" forKey:@"pushId"];
-    [dict setObject:@"2" forKey:@"deviceTypeId"];
-    [dict setObject:@"john@email.com" forKey:@"email"];
-    [dict setObject:@"imei_123" forKey:@"imei"];
-    [dict setObject:@"hLd2KmCZifCbkbmaj6iokQ==" forKey:@"password"];
-     
-    
-    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:dict options:0 error:nil];
-    NSString *jsonString;
-    if (!jsonData) {
-    } else {
-        jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-    }
-    
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:url]];
-    request.HTTPMethod = @"POST";
-    [request setValue:@"application/json; charset=utf-8" forHTTPHeaderField:@"Content-Type"];
-    request.HTTPBody = jsonData;
-    
-    __block NSInteger code;
-    NSOperationQueue *queue = [[NSOperationQueue alloc] init];
-    [NSURLConnection sendAsynchronousRequest:request queue:queue completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
-        NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *) response;
-        code = [httpResponse statusCode];
-        NSLog(@"Code %ld, Data: %@", (long)code, data);
-        switch (code) {
-            case 200:{
-                
-                NSDictionary *dictionary = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil]; //el json se guarda en este array
-                _fbID = [dictionary objectForKey:@"facebookId"];
-                _idAltruus = [dictionary objectForKey:@"id"];
-                _token = [dictionary objectForKey:@"token"];
-                break;
-            }
-            default:{
-                _fbID = @"";
-                _idAltruus = @"";
-                _token = @"";
-                break;
-            }
-        }
-    }];
-    
-    NSLog(@"%@, %@, %@", _fbID, _idAltruus, _token);
-    return code;
-}
-
--(void)prueba{
-    NSString *url = @"http://138.197.95.215:8080/altruus-v2-authentication/api/v2/consumer/facebook_sign_in";
-    
-    NSMutableDictionary *dict = [[NSMutableDictionary alloc]init];
-    [dict setObject:@"1dd608f2-c6a1-11e3-851d-000c2940e62c" forKey:@"pushId"];
-    [dict setObject:@"2" forKey:@"deviceTypeId"];
-    [dict setObject:@"john@email.com" forKey:@"email"];
-    [dict setObject:@"imei_123" forKey:@"imei"];
-    [dict setObject:@"hLd2KmCZifCbkbmaj6iokQ==" forKey:@"password"];
-    
-    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:dict options:0 error:nil];
-    
-    NSString *jsonString;
-    if (!jsonData) {
-    } else {
-        jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-    }
-    
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:url]];
-    
-    request.HTTPMethod = @"POST";
-    [request setValue:@"application/json; charset=utf-8" forHTTPHeaderField:@"Content-Type"];
-    request.HTTPBody = jsonData;
-    
-    AppDelegate *delegate = [AppDelegate sharedAppDelegate];
-    NSString *pushId = delegate.pushId;
-    
-    NSLog(@"****************************************************************************************************");
-    NSOperationQueue *queue = [[NSOperationQueue alloc] init];
-    [NSURLConnection sendAsynchronousRequest:request queue:queue completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
-        NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *) response;
-        NSLog(@"response status code: %ld", (long)[httpResponse statusCode]);
-        NSLog(@"Response: %@",[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);
-        
-        NSDictionary *dictionary = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil]; //el json se guarda en este array
-        
-        NSLog(@"Dictionary: %@",dictionary);
-        
-        // do stuff
-    }];
-    
-    
-}
-*/
 
 - (void)showRegisterError
 {

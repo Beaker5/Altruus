@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="12121" systemVersion="16F73" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="13771" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12089"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13772"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -16,7 +16,7 @@
             <rect key="frame" x="0.0" y="0.0" width="320" height="75"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
             <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="wSl-iL-RvP" id="dlh-Mr-NIj">
-                <rect key="frame" x="0.0" y="0.0" width="287" height="74.5"/>
+                <rect key="frame" x="0.0" y="0.0" width="286" height="74.5"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="lf7-Ls-knD" customClass="RoundedImageView">
@@ -27,13 +27,16 @@
                         </constraints>
                     </imageView>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="You sent a free gift to somebody at Apple" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="FE3-7v-ghA">
-                        <rect key="frame" x="68" y="12" width="201" height="33.5"/>
+                        <rect key="frame" x="68" y="8" width="200" height="34"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="34" id="pq1-7J-Bko"/>
+                        </constraints>
                         <fontDescription key="fontDescription" type="system" pointSize="14"/>
                         <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                         <nil key="highlightedColor"/>
                     </label>
-                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="8 hours ago" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7Dt-hS-16A">
-                        <rect key="frame" x="68" y="50.5" width="58" height="12"/>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="8 hours ago" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ugw-mI-F2s">
+                        <rect key="frame" x="68" y="50" width="58" height="12"/>
                         <fontDescription key="fontDescription" type="system" pointSize="10"/>
                         <color key="textColor" red="0.58431375029999999" green="0.66666668650000005" blue="0.76078432799999995" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <nil key="highlightedColor"/>
@@ -44,16 +47,25 @@
                             <constraint firstAttribute="height" constant="50" id="jur-eU-abk"/>
                         </constraints>
                     </imageView>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="8 hours ago" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7Dt-hS-16A">
+                        <rect key="frame" x="68" y="40" width="58" height="12"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="10"/>
+                        <color key="textColor" red="0.58431375029999999" green="0.66666668650000005" blue="0.76078432799999995" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <nil key="highlightedColor"/>
+                    </label>
                 </subviews>
                 <constraints>
+                    <constraint firstItem="Ugw-mI-F2s" firstAttribute="leading" secondItem="7Dt-hS-16A" secondAttribute="leading" id="7TI-CK-ZgC"/>
+                    <constraint firstItem="Ugw-mI-F2s" firstAttribute="bottom" secondItem="lf7-Ls-knD" secondAttribute="bottom" id="BZl-DR-WIP"/>
+                    <constraint firstItem="7Dt-hS-16A" firstAttribute="leading" secondItem="lf7-Ls-knD" secondAttribute="trailing" constant="10" id="Ecv-2X-25V"/>
                     <constraint firstItem="7bd-Jb-kIb" firstAttribute="centerX" secondItem="dlh-Mr-NIj" secondAttribute="centerX" id="FJr-5L-0tY"/>
+                    <constraint firstItem="Ugw-mI-F2s" firstAttribute="top" secondItem="FE3-7v-ghA" secondAttribute="bottom" constant="8" symbolic="YES" id="K0g-LK-R5L"/>
                     <constraint firstItem="lf7-Ls-knD" firstAttribute="leading" secondItem="dlh-Mr-NIj" secondAttribute="leading" constant="8" id="P9b-r2-pqt"/>
-                    <constraint firstAttribute="trailingMargin" secondItem="FE3-7v-ghA" secondAttribute="trailing" constant="10" id="cnp-bF-ccQ"/>
-                    <constraint firstItem="FE3-7v-ghA" firstAttribute="leading" secondItem="lf7-Ls-knD" secondAttribute="trailing" constant="10" id="dtW-jV-Ivl"/>
-                    <constraint firstItem="FE3-7v-ghA" firstAttribute="top" secondItem="lf7-Ls-knD" secondAttribute="top" id="evX-CO-PnY"/>
+                    <constraint firstAttribute="trailingMargin" secondItem="FE3-7v-ghA" secondAttribute="trailing" constant="10" id="eLc-cl-bGx"/>
                     <constraint firstItem="7bd-Jb-kIb" firstAttribute="centerY" secondItem="dlh-Mr-NIj" secondAttribute="centerY" id="f7D-4l-xEm"/>
-                    <constraint firstItem="7Dt-hS-16A" firstAttribute="leading" secondItem="FE3-7v-ghA" secondAttribute="leading" id="ro9-Ff-Zos"/>
-                    <constraint firstItem="7Dt-hS-16A" firstAttribute="top" secondItem="FE3-7v-ghA" secondAttribute="bottom" constant="5" id="v6y-Af-kYq"/>
+                    <constraint firstAttribute="bottomMargin" secondItem="7Dt-hS-16A" secondAttribute="bottom" constant="12" id="fiG-cl-Yy1"/>
+                    <constraint firstItem="FE3-7v-ghA" firstAttribute="leading" secondItem="lf7-Ls-knD" secondAttribute="trailing" constant="10" id="vXs-Hr-aJw"/>
+                    <constraint firstItem="7Dt-hS-16A" firstAttribute="top" secondItem="dlh-Mr-NIj" secondAttribute="topMargin" constant="29" id="wD3-vE-Kea"/>
                     <constraint firstItem="lf7-Ls-knD" firstAttribute="centerY" secondItem="dlh-Mr-NIj" secondAttribute="centerY" id="zs4-yr-ISp"/>
                 </constraints>
             </tableViewCellContentView>
@@ -61,6 +73,7 @@
                 <outlet property="imageview" destination="lf7-Ls-knD" id="qUP-Fo-On1"/>
                 <outlet property="mainLabel" destination="FE3-7v-ghA" id="S7l-Jj-sdg"/>
                 <outlet property="redeemImageview" destination="7bd-Jb-kIb" id="Gt9-cl-Uad"/>
+                <outlet property="redeemLabel" destination="Ugw-mI-F2s" id="W8P-gD-zIX"/>
                 <outlet property="subLabel" destination="7Dt-hS-16A" id="NHk-Uv-w6d"/>
             </connections>
             <point key="canvasLocation" x="537" y="246.5"/>

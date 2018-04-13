@@ -186,6 +186,48 @@
         if ([DataProvider networkConnected]) {
             AppDelegate *delegate = [AppDelegate sharedAppDelegate];
             NSManagedObjectContext *context = delegate.managedObjectContext;
+            self.localUser = [User getLocalUserSesion:context];
+            
+            NSString *urlString = [NSString stringWithFormat:@"%@?session=%@", USER_PROFILE_V3, self.localUser.session ];
+            NSURL *url = [NSURL URLWithString:urlString];
+            NSLog(@"URL: %@, URLSTRING: %@", urlString, url);
+            NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url
+                                                                   cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData
+                                                               timeoutInterval:0.0];
+            NSURLResponse *response;
+            NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:nil];
+            NSDictionary *dictionary = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil]; //el json se guarda en este array
+            
+            NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
+            NSInteger codeService = [httpResponse statusCode];
+            if (codeService == 200) {
+                NSLog(@"Dictionary : %@", dictionary);
+                NSDictionary *dictStatus = [dictionary objectForKey:@"status"];
+                NSInteger code = [[dictStatus objectForKey:@"code"] integerValue];
+                if(code == 200){
+                    dictionary = [dictionary objectForKey:@"entity"];
+                    NSString *country, *firstName, *friendsCount, *lastName, *receivedGifts, *sendGifts;
+                    country = [dictionary objectForKey:@"country"];
+                    firstName = [dictionary objectForKey:@"firstName"];
+                    friendsCount = [dictionary objectForKey:@"friendsCount"];
+                    lastName = [dictionary objectForKey:@"lastName"];
+                    receivedGifts = [dictionary objectForKey:@"receivedGifts"];
+                    sendGifts = [dictionary objectForKey:@"sentGifts"];
+                    
+                    NSLog(@"Diccionario %@", dictionary);
+                    
+                    self.deliveredGiftsLabel.text = [NSString stringWithFormat:@"%@", sendGifts];
+                    self.recievedGiftsLabel.text = [NSString stringWithFormat:@"%@", receivedGifts];;
+                    self.profileLocationLabel.text = country;
+                }else{
+                    self.profileLocationLabel.text = @"";
+                }
+                self.totalFriendsLabel.text = [NSString stringWithFormat:@"%ld", [DataProvider getNumberOfFriends]];
+            }
+            
+            /*
+            AppDelegate *delegate = [AppDelegate sharedAppDelegate];
+            NSManagedObjectContext *context = delegate.managedObjectContext;
             //self.localUser = [User getLocalUserInContext:context];
             self.localUser = [User getLocalUserSesion:context];
             
@@ -193,9 +235,7 @@
             
             [dict setObject:self.localUser.tokenAltruus forKey:@"token"];
             [dict setObject:self.localUser.userIDAltruus forKey:@"userId"];
-            //ELIMINAR
-            //[dict setObject:@"3r0lgu9g49jm4ivv14cd0jnreh" forKey:@"token"];
-            //[dict setObject:@"1" forKey:@"userId"];
+            
             
             NSData *jsonData = [NSJSONSerialization dataWithJSONObject:dict options:0 error:nil];
             NSString *jsonString;
@@ -217,9 +257,7 @@
             
             NSInteger code = [httpResponse statusCode];
             dict = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
-            //NSLog(@"-----------------------------------------------------------------------------------");
-            //NSLog(@"Codigo: %ld, Diccionario: %@", (long)code, array);
-            //NSLog(@"-----------------------------------------------------------------------------------");
+            
             if (code == 200) {
                 NSString *country, *firstName, *friendsCount, *lastName, *receivedGifts, *sendGifts;
                 country = [dict objectForKey:@"country"];
@@ -239,48 +277,7 @@
             }
             self.totalFriendsLabel.text = [NSString stringWithFormat:@"%ld", [DataProvider getNumberOfFriends]];
             //self.totalFriendsLabel.text = [NSString stringWithFormat:@"%ld", contador];
-            /*
-             dispatch_async(dispatch_get_main_queue(), ^{
-             //if (delegate.accessGranted) {
-             ABAddressBookRef addressBook = ABAddressBookCreate();
-             ABAddressBookRequestAccessWithCompletion(addressBook, ^(bool granted, CFErrorRef error) {
-             //NSMutableArray *contactList = [[NSMutableArray alloc] init];
-             CFArrayRef allPeople = ABAddressBookCopyArrayOfAllPeople(addressBook);
-             CFIndex nPeople = ABAddressBookGetPersonCount(addressBook);
-             NSInteger contador = 0;
-             for (int i=0;i < nPeople;i++) {
-             BOOL guarda = NO;
-             ABRecordRef ref = CFArrayGetValueAtIndex(allPeople,i);
-             //Phone number
-             NSString* mobileLabel;
-             ABMultiValueRef phones =(__bridge ABMultiValueRef)((__bridge NSString*)ABRecordCopyValue(ref, kABPersonPhoneProperty));
-             BOOL hasIphone = NO;
-             BOOL hasMobile = NO;
-             for(CFIndex i = 0; i < ABMultiValueGetCount(phones); i++){
-             mobileLabel = (__bridge NSString*)ABMultiValueCopyLabelAtIndex(phones, i);
-             if([mobileLabel isEqualToString:(NSString *)kABPersonPhoneMobileLabel]){
-             hasMobile = YES;
-             }else if ([mobileLabel isEqualToString:(NSString*)kABPersonPhoneIPhoneLabel]){
-             hasIphone = YES;
-             break ;
-             }
-             }
-             if(hasIphone){
-             guarda = YES;
-             }else if(hasMobile){
-             guarda = YES;
-             }
-             if (guarda) {
-             contador++;
-             }
-             }
-             //self.totalFriendsLabel.text = [NSString stringWithFormat:@"%ld", contador];
-             
-             //dispatch_semaphore_signal(semaphore);
-             });
-             // }
-             });
-             */
+            */
         }else{
             UIAlertView *alert = [[UIAlertView alloc]
                                   initWithTitle:nil

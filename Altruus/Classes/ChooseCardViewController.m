@@ -15,7 +15,6 @@
 #import "RedeemGiftViewController.h"
 #import "DataProvider.h"
 
-//@interface ChooseCardViewController ()<NewCardViewControllerDelegate, ExampleViewControllerDelegate>
 @interface ChooseCardViewController ()<ExampleViewControllerDelegate>
 
 @property (nonatomic, assign) NSInteger numberCards;
@@ -71,13 +70,11 @@
     
     self.payButton.layer.cornerRadius = 10;
     
-    /*****************************************************************************/
     self.titleLabel.text = [self.gift objectForKey:@"giftName"];
     self.imageView.image = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@%@",PREFIJO_PHOTO, [self.gift objectForKey:@"picture"]]]]];
     
     [self devuelveListaTarjetas];
     
-    NSLog(@"GiftingAction : %ld", (long)self.giftingAction);
     
     float price = [[self.gift objectForKey:@"price"] floatValue];
     if ([self.selectedFriends count] > 0) {
@@ -94,53 +91,44 @@
     @try {
         if ([DataProvider networkConnected]) {
             self.numberCards = 0;
-            /*****************************************************************************/
-            NSMutableDictionary *dict = [[NSMutableDictionary alloc]init];
-            [dict setObject:self.localUser.tokenAltruus forKey:@"token"];
-            [dict setObject:self.localUser.userIDAltruus forKey:@"userId"];
-            //ELIMINAR
-            //[dict setObject:@"kj4mopn72lbqts89k50p0k7ouu" forKey:@"token"];
-            //[dict setObject:@"5" forKey:@"userId"];
             
+            NSString *urlString = [NSString stringWithFormat:@"%@?session=%@", LIST_CARDS_V3, self.localUser.session ];
+            NSURL *url = [NSURL URLWithString:urlString];
+            NSLog(@"URL: %@, URLSTRING: %@", urlString, url);
+            NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url
+                                                                   cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData
+                                                               timeoutInterval:0.0];
+            NSURLResponse *response;
+            NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:nil];
+            NSDictionary *dictionary = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil]; //el json se guarda en este array
             
-            NSData *jsonData = [NSJSONSerialization dataWithJSONObject:dict options:0 error:nil];
-            
-            NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:LIST_CARDS]];
-            request.HTTPMethod = @"POST";
-            [request setValue:@"application/json; charset=utf-8" forHTTPHeaderField:@"Content-Type"];
-            request.HTTPBody = jsonData;
-            
-            NSURLResponse *res = nil;
-            NSError *err = nil;
-            
-            NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&res error:&err];
-            NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)res;
-            
-            NSInteger code = [httpResponse statusCode];
-            //NSDictionary *dictionary = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
-            NSArray *array = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
-            
-            _cards = [NSMutableArray new];
-            _arrayCards = [NSMutableArray new];
-            _indexSelected = -1;
-            
-            if (code == 200) {
-                NSLog(@"Array %@", array);
-                for (NSDictionary *dict in array) {
-                    [_cards addObject:[NSString stringWithFormat:@"**** **** **** %@", [dict objectForKey:@"last4"]]];
-                    [_arrayCards addObject:dict];
-                    
-                    NSString *aux = [dict objectForKey:@"last4"];
-                    if ([aux isEqualToString:_last4]) {
-                        _indexSelected = self.numberCards;
+            NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
+            NSInteger codeService = [httpResponse statusCode];
+            if (codeService == 200) {
+                NSLog(@"Dictionary : %@", dictionary);
+                NSDictionary *dictStatus = [dictionary objectForKey:@"status"];
+                NSInteger code = [[dictStatus objectForKey:@"code"] integerValue];
+                
+                _cards = [NSMutableArray new];
+                _arrayCards = [NSMutableArray new];
+                _indexSelected = -1;
+                
+                if(code == 200){
+                    NSArray *array = [dictionary objectForKey:@"results"];
+                    for (NSDictionary *dict in array) {
+                        [_cards addObject:[NSString stringWithFormat:@"**** **** **** %@", [dict objectForKey:@"last4"]]];
+                        [_arrayCards addObject:dict];
+                        
+                        NSString *aux = [dict objectForKey:@"last4"];
+                        if ([aux isEqualToString:_last4]) {
+                            _indexSelected = self.numberCards;
+                        }
+                        
+                        self.numberCards++;
                     }
-                    
-                    self.numberCards++;
                 }
             }
-            /*****************************************************************************/
             
-            //NSArray *cards = @[@"**** 3456", @"**** 5424", @"Add new card"];
             [_cards addObject:@"Add new card"];
             self.pickerCard = [[DownPicker alloc] initWithTextField:self.payPicker withData:_cards];
             [self.pickerCard setPlaceholder:@"Choose a card"];
@@ -173,7 +161,6 @@
     
     if (index == _numberCards) {
         UIViewController *controller = [self.storyboard instantiateViewControllerWithIdentifier:@"newCard"];
-        //((NewCardViewController*)controller).local = self.gift;
         ((NewCardViewController*)controller).localUser = self.localUser;
         ((NewCardViewController*)controller).delegate = self;
         [self.navigationController pushViewController:controller animated:YES];
@@ -185,7 +172,6 @@
 
 -(IBAction)payGifts:(UIButton*)sender{
     NSInteger index = [self.pickerCard selectedIndex];
-    //NSLog(@"Index: %ld", (long)index);
     if (index == -1 || index == _numberCards) {
         UIAlertView *alert = [[UIAlertView alloc]
                               initWithTitle:nil
@@ -208,67 +194,57 @@
                     NSInteger index = [self.pickerCard selectedIndex];
                     NSDictionary *card = [_arrayCards objectAtIndex:index];
                     
-                    NSMutableDictionary *dict = [[NSMutableDictionary alloc]init];
-                    [dict setObject:friend.phoneNumber forKey:@"friendPhone"];
-                    [dict setObject:[self.gift objectForKey:@"id"] forKey:@"giftId"];
-                    [dict setObject:[card objectForKey:@"id"] forKey:@"paymentMethodId"];
-                    [dict setObject:self.localUser.tokenAltruus forKey:@"token"];
-                    [dict setObject:self.localUser.userIDAltruus forKey:@"userId"];
-                    //ELIMINAR
-                    //[dict setObject:@"kj4mopn72lbqts89k50p0k7ouu" forKey:@"token"];
-                    //[dict setObject:@"5" forKey:@"userId"];
+                    NSString *urlString = [NSString stringWithFormat:@"%@?session=%@&giftId=%@&phone=%@&paymentMethodId=%@", SEND_PAID_GIFT_V3, self.localUser.session, [self.gift objectForKey:@"id"],friend.phoneNumber,[card objectForKey:@"id"]];
+                    NSURL *url = [NSURL URLWithString:urlString];
+                    NSLog(@"URL: %@", url);
+                    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url
+                                                                           cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData
+                                                                       timeoutInterval:0.0];
+                    NSURLResponse *response;
+                    NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:nil];
+                    NSDictionary *dictionary = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil]; //el json se guarda en este array
                     
-                    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:dict options:0 error:nil];
-                    
-                    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:SEND_PAID_GIFT]];
-                    request.HTTPMethod = @"POST";
-                    [request setValue:@"application/json; charset=utf-8" forHTTPHeaderField:@"Content-Type"];
-                    request.HTTPBody = jsonData;
-                    
-                    NSURLResponse *res = nil;
-                    NSError *err = nil;
-                    
-                    //NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&res error:&err];
-                    [NSURLConnection sendSynchronousRequest:request returningResponse:&res error:&err];
-                    NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)res;
-                    
-                    NSInteger code = [httpResponse statusCode];
-                    NSLog(@"Code: %ld, Response: %@", (long)code, httpResponse);
-                    if (code != 200) {
-                        error = YES;
+                    NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
+                    NSInteger codeService = [httpResponse statusCode];
+                    if (codeService == 200) {
+                        NSLog(@"Dictionary : %@", dictionary);
+                        //NSDictionary *dictStatus = [dictionary objectForKey:@"status"];
+                        NSInteger code = [[dictionary objectForKey:@"code"] integerValue];
+                        if (code != 200) {
+                            error = YES;
+                        }else{
+                            //PENDIENTE
+                        }
                     }
+                    
                 }//Fin for
                 
             }else if(self.giftingAction == GiftingActionSendGiftToOneUser) {
                 NSInteger index = [self.pickerCard selectedIndex];
                 NSDictionary *card = [_arrayCards objectAtIndex:index];
                 
-                NSMutableDictionary *dict = [[NSMutableDictionary alloc]init];
-                [dict setObject:self.friend.phoneNumber forKey:@"friendPhone"];
-                [dict setObject:[self.gift objectForKey:@"id"] forKey:@"giftId"];
-                [dict setObject:[card objectForKey:@"id"] forKey:@"paymentMethodId"];
-                [dict setObject:self.localUser.tokenAltruus forKey:@"token"];
-                [dict setObject:self.localUser.userIDAltruus forKey:@"userId"];
+                NSString *urlString = [NSString stringWithFormat:@"%@?session=%@&giftId=%@&phone=%@&paymentMethodId=%@", SEND_PAID_GIFT_V3, self.localUser.session, [self.gift objectForKey:@"id"],self.friend.phoneNumber,[card objectForKey:@"id"]];
+                NSURL *url = [NSURL URLWithString:urlString];
+                NSLog(@"URL: %@", url);
+                NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url
+                                                                       cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData
+                                                                   timeoutInterval:0.0];
+                NSURLResponse *response;
+                NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:nil];
+                NSDictionary *dictionary = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil]; //el json se guarda en este array
                 
-                NSData *jsonData = [NSJSONSerialization dataWithJSONObject:dict options:0 error:nil];
-                
-                NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:SEND_PAID_GIFT]];
-                request.HTTPMethod = @"POST";
-                [request setValue:@"application/json; charset=utf-8" forHTTPHeaderField:@"Content-Type"];
-                request.HTTPBody = jsonData;
-                
-                NSURLResponse *res = nil;
-                NSError *err = nil;
-                
-                //NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&res error:&err];
-                [NSURLConnection sendSynchronousRequest:request returningResponse:&res error:&err];
-                NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)res;
-                
-                NSInteger code = [httpResponse statusCode];
-                NSLog(@"Code: %ld, Response: %@", (long)code, httpResponse);
-                if (code != 200) {
-                    error = YES;
+                NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
+                NSInteger codeService = [httpResponse statusCode];
+                if (codeService == 200) {
+                    
+                    NSInteger code = [[dictionary objectForKey:@"code"] integerValue];
+                    if (code != 200) {
+                        error = YES;
+                    }else{
+                        //PENDIENTE
+                    }
                 }
+                
             }
             
             
@@ -362,10 +338,13 @@
     });
 }
 
-- (void)exampleViewController:(UIViewController *)controller didFinishWithError:(NSError *)error {
+- (void)exampleViewController:(UIViewController *)controller didFinishWithError:(NSError *)error andMessage:(NSString *)message {
     dispatch_async(dispatch_get_main_queue(), ^{
-        //UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:[error localizedDescription] preferredStyle:UIAlertControllerStyleAlert];
-        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:@"Can't Save Card" preferredStyle:UIAlertControllerStyleAlert];
+        
+        
+        __block NSString *errorMessage = [NSString stringWithFormat:@"Can't Save Card\r%@", [message stringByReplacingOccurrencesOfString:@"_" withString:@" "]];
+        
+        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:errorMessage preferredStyle:UIAlertControllerStyleAlert];
         UIAlertAction *action = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(__unused UIAlertAction *action) {
             [self.navigationController popViewControllerAnimated:YES];
         }];

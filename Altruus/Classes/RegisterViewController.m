@@ -56,21 +56,12 @@
     
     self.registerButton.layer.cornerRadius = 10;
     
-    //heTextField.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;
-    //theTextField.textAlignment = UITextAlignmentCenter;
-    
-    /*
-     
-    self.textField.mask = [[NSStringMask alloc] initWithPattern:@"\\+ (\\d{2}) \\((\\d{3})\\) (\\d{5})-(\\d{4})" placeholder:@"_"];
-     */
-    NSLog(@"Local User: %@", self.localUser);
 }
 
 - (IBAction)tappedRegister:(UIButton *)sender {
     @try {
         if ([DataProvider networkConnected]) {
             NSMutableDictionary *dict = [[NSMutableDictionary alloc]init];
-            //NSInteger countryCode = [self returnCountryCode:country];
             NSInteger countryCode = [self.pickerCountry selectedIndex] + 1;
             [dict setObject:[NSNumber numberWithInteger:countryCode] forKey:@"countryId"];
             [dict setObject:self.birthdayTextField.text forKey:@"birthday"];
@@ -98,7 +89,6 @@
             if(code2 == 200){
                 AppDelegate *delegate = [AppDelegate sharedAppDelegate];
                 NSString *pushId = delegate.pushId;
-                //pushId = @"8278-2335-gdfg-335"; //ELIMINAR PUSHID
                 
                 dict = [[NSMutableDictionary alloc]init];
                 [dict setObject:pushId forKey:@"pushId"];

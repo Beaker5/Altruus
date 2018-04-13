@@ -118,26 +118,25 @@
 		11FC13E51B4C5AE000F9100B /* COFriendsCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 11FC13E41B4C5AE000F9100B /* COFriendsCell.m */; };
 		6928C9E31F26D3C400D61891 /* GiftsReceived.m in Sources */ = {isa = PBXBuildFile; fileRef = 6928C9DD1F26D3C400D61891 /* GiftsReceived.m */; };
 		6928C9E51F26D3C400D61891 /* UpdatesGifts.m in Sources */ = {isa = PBXBuildFile; fileRef = 6928C9E11F26D3C400D61891 /* UpdatesGifts.m */; };
+		692DF2021FC1207D0065005D /* LoadingTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 692DF2011FC1207D0065005D /* LoadingTableViewCell.m */; };
 		695037921EF8CED2007F3ADF /* Altruus.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = CA80FDB41E78E38400A9CA70 /* Altruus.entitlements */; };
 		695991261EF3169B00C5E4C6 /* GiftsReceivedTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 695991251EF3169B00C5E4C6 /* GiftsReceivedTableViewCell.xib */; };
 		695991291EF31A5B00C5E4C6 /* GiftsReceivedTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 695991281EF31A5B00C5E4C6 /* GiftsReceivedTableViewCell.m */; };
 		6981ED961ECD2CB100651BB1 /* LoginV3ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6981ED951ECD2CB100651BB1 /* LoginV3ViewController.m */; };
 		6981EDBA1ECDF78700651BB1 /* AccountKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6981EDB51ECDF78700651BB1 /* AccountKit.framework */; };
 		6981EDBB1ECDF78700651BB1 /* AccountKitStrings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 6981EDB61ECDF78700651BB1 /* AccountKitStrings.bundle */; };
-		6981EDBC1ECDF78700651BB1 /* Bolts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6981EDB71ECDF78700651BB1 /* Bolts.framework */; };
-		6981EDBD1ECDF78700651BB1 /* FBSDKCoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6981EDB81ECDF78700651BB1 /* FBSDKCoreKit.framework */; };
-		6981EDBE1ECDF78700651BB1 /* FBSDKLoginKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6981EDB91ECDF78700651BB1 /* FBSDKLoginKit.framework */; };
-		6981EDC01ECDFA8400651BB1 /* FBSDKShareKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6981EDBF1ECDFA8400651BB1 /* FBSDKShareKit.framework */; };
 		6981EDC21ECE3DE100651BB1 /* OneSignal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6981EDC11ECE3DE100651BB1 /* OneSignal.framework */; };
 		6997297D1EB676F800ACE6DF /* Friend.m in Sources */ = {isa = PBXBuildFile; fileRef = 699729771EB676F800ACE6DF /* Friend.m */; };
 		6997297F1EB676F800ACE6DF /* Organization.m in Sources */ = {isa = PBXBuildFile; fileRef = 6997297B1EB676F800ACE6DF /* Organization.m */; };
 		699729821EB67B3700ACE6DF /* DataProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 699729811EB67B3700ACE6DF /* DataProvider.m */; };
 		699729851EC01E3700ACE6DF /* RegisterViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 699729841EC01E3700ACE6DF /* RegisterViewController.m */; };
 		699729881EC069C400ACE6DF /* GiftReceivedViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 699729871EC069C400ACE6DF /* GiftReceivedViewController.m */; };
+		69A5C31E1FB24356003CBBA8 /* OrganizationsFreeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 69A5C31D1FB24356003CBBA8 /* OrganizationsFreeViewController.m */; };
 		69BF1F731F0090730042A8AB /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 69BF1F721F0090730042A8AB /* SystemConfiguration.framework */; };
 		69BF1F761F00928F0042A8AB /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 69BF1F751F00928F0042A8AB /* Reachability.m */; };
 		69E6F3971EE4980E00AC6AA2 /* ReceivedDeliveredViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 69E6F3961EE4980E00AC6AA2 /* ReceivedDeliveredViewController.m */; };
 		69E6F3991EE8DFA800AC6AA2 /* terms.html in Resources */ = {isa = PBXBuildFile; fileRef = 69E6F3981EE8DFA800AC6AA2 /* terms.html */; };
+		69ECC0241F958A3D003A3AB4 /* ObtenJSON.m in Sources */ = {isa = PBXBuildFile; fileRef = 69ECC0231F958A3D003A3AB4 /* ObtenJSON.m */; };
 		69F1DC8E1EDD462D00C3C0E4 /* GiftsReceivedViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 69F1DC8D1EDD462D00C3C0E4 /* GiftsReceivedViewController.m */; };
 		69F1DC911EDD513A00C3C0E4 /* GiftReceivedDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 69F1DC901EDD513A00C3C0E4 /* GiftReceivedDetailViewController.m */; };
 		9B6BFFB8D69A3074B911B852 /* libPods-Altruus-AbundanceTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C058EA8B21756BE82C3938A3 /* libPods-Altruus-AbundanceTests.a */; };
@@ -368,6 +367,9 @@
 		6928C9E11F26D3C400D61891 /* UpdatesGifts.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UpdatesGifts.m; path = DataModel/UpdatesGifts.m; sourceTree = "<group>"; };
 		6928C9E61F2ADA4600D61891 /* Altruus 2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Altruus 2.xcdatamodel"; sourceTree = "<group>"; };
 		6928C9E71F2E947E00D61891 /* Altruus 3.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Altruus 3.xcdatamodel"; sourceTree = "<group>"; };
+		692DF2001FC1207D0065005D /* LoadingTableViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = LoadingTableViewCell.h; path = Classes/LoadingTableViewCell.h; sourceTree = "<group>"; };
+		692DF2011FC1207D0065005D /* LoadingTableViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = LoadingTableViewCell.m; path = Classes/LoadingTableViewCell.m; sourceTree = "<group>"; };
+		694BBA261FA82D1E00FE4973 /* Altruus 4.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Altruus 4.xcdatamodel"; sourceTree = "<group>"; };
 		695991251EF3169B00C5E4C6 /* GiftsReceivedTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = GiftsReceivedTableViewCell.xib; path = XIB/GiftsReceivedTableViewCell.xib; sourceTree = "<group>"; };
 		695991271EF31A5B00C5E4C6 /* GiftsReceivedTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GiftsReceivedTableViewCell.h; path = "Custom-v2/GiftsReceivedTableViewCell.h"; sourceTree = "<group>"; };
 		695991281EF31A5B00C5E4C6 /* GiftsReceivedTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GiftsReceivedTableViewCell.m; path = "Custom-v2/GiftsReceivedTableViewCell.m"; sourceTree = "<group>"; };
@@ -376,9 +378,6 @@
 		6981EDB51ECDF78700651BB1 /* AccountKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AccountKit.framework; path = Altruus/Frameworks/AccountKit.framework; sourceTree = "<group>"; };
 		6981EDB61ECDF78700651BB1 /* AccountKitStrings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = AccountKitStrings.bundle; path = Altruus/Frameworks/AccountKitStrings.bundle; sourceTree = "<group>"; };
 		6981EDB71ECDF78700651BB1 /* Bolts.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Bolts.framework; path = Altruus/Frameworks/Bolts.framework; sourceTree = "<group>"; };
-		6981EDB81ECDF78700651BB1 /* FBSDKCoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FBSDKCoreKit.framework; path = Altruus/Frameworks/FBSDKCoreKit.framework; sourceTree = "<group>"; };
-		6981EDB91ECDF78700651BB1 /* FBSDKLoginKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FBSDKLoginKit.framework; path = Altruus/Frameworks/FBSDKLoginKit.framework; sourceTree = "<group>"; };
-		6981EDBF1ECDFA8400651BB1 /* FBSDKShareKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FBSDKShareKit.framework; path = Altruus/Frameworks/FBSDKShareKit.framework; sourceTree = "<group>"; };
 		6981EDC11ECE3DE100651BB1 /* OneSignal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OneSignal.framework; path = Pods/OneSignal/iOS_SDK/OneSignalSDK/Framework/OneSignal.framework; sourceTree = "<group>"; };
 		699729761EB676F800ACE6DF /* Friend.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Friend.h; path = DataModel/Friend.h; sourceTree = "<group>"; };
 		699729771EB676F800ACE6DF /* Friend.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Friend.m; path = DataModel/Friend.m; sourceTree = "<group>"; };
@@ -390,12 +389,16 @@
 		699729841EC01E3700ACE6DF /* RegisterViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RegisterViewController.m; path = Classes/RegisterViewController.m; sourceTree = "<group>"; };
 		699729861EC069C400ACE6DF /* GiftReceivedViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GiftReceivedViewController.h; path = Classes/GiftReceivedViewController.h; sourceTree = "<group>"; };
 		699729871EC069C400ACE6DF /* GiftReceivedViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GiftReceivedViewController.m; path = Classes/GiftReceivedViewController.m; sourceTree = "<group>"; };
+		69A5C31C1FB24356003CBBA8 /* OrganizationsFreeViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = OrganizationsFreeViewController.h; path = Classes/OrganizationsFreeViewController.h; sourceTree = "<group>"; };
+		69A5C31D1FB24356003CBBA8 /* OrganizationsFreeViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = OrganizationsFreeViewController.m; path = Classes/OrganizationsFreeViewController.m; sourceTree = "<group>"; };
 		69BF1F721F0090730042A8AB /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		69BF1F741F00928F0042A8AB /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Reachability.h; path = DataModel/Reachability.h; sourceTree = "<group>"; };
 		69BF1F751F00928F0042A8AB /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Reachability.m; path = DataModel/Reachability.m; sourceTree = "<group>"; };
 		69E6F3951EE4980E00AC6AA2 /* ReceivedDeliveredViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ReceivedDeliveredViewController.h; path = Classes/ReceivedDeliveredViewController.h; sourceTree = "<group>"; };
 		69E6F3961EE4980E00AC6AA2 /* ReceivedDeliveredViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ReceivedDeliveredViewController.m; path = Classes/ReceivedDeliveredViewController.m; sourceTree = "<group>"; };
 		69E6F3981EE8DFA800AC6AA2 /* terms.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = terms.html; sourceTree = "<group>"; };
+		69ECC0221F958A3D003A3AB4 /* ObtenJSON.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ObtenJSON.h; path = JSON/ObtenJSON.h; sourceTree = "<group>"; };
+		69ECC0231F958A3D003A3AB4 /* ObtenJSON.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ObtenJSON.m; path = JSON/ObtenJSON.m; sourceTree = "<group>"; };
 		69F1DC8C1EDD462D00C3C0E4 /* GiftsReceivedViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GiftsReceivedViewController.h; path = Classes/GiftsReceivedViewController.h; sourceTree = "<group>"; };
 		69F1DC8D1EDD462D00C3C0E4 /* GiftsReceivedViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GiftsReceivedViewController.m; path = Classes/GiftsReceivedViewController.m; sourceTree = "<group>"; };
 		69F1DC8F1EDD513A00C3C0E4 /* GiftReceivedDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GiftReceivedDetailViewController.h; path = Classes/GiftReceivedDetailViewController.h; sourceTree = "<group>"; };
@@ -433,12 +436,9 @@
 			files = (
 				69BF1F731F0090730042A8AB /* SystemConfiguration.framework in Frameworks */,
 				6981EDC21ECE3DE100651BB1 /* OneSignal.framework in Frameworks */,
-				6981EDBE1ECDF78700651BB1 /* FBSDKLoginKit.framework in Frameworks */,
-				6981EDBC1ECDF78700651BB1 /* Bolts.framework in Frameworks */,
 				CAC9E4DB1E9AD88E00BF77E9 /* AddressBook.framework in Frameworks */,
 				CAC9E4DC1E9AD88E00BF77E9 /* AddressBookUI.framework in Frameworks */,
 				11EAA0B21D7F76C20081830A /* AVKit.framework in Frameworks */,
-				6981EDC01ECDFA8400651BB1 /* FBSDKShareKit.framework in Frameworks */,
 				1181D22F1BD429D700DB52ED /* Foundation.framework in Frameworks */,
 				1178261D1BD0314A00C59DCD /* CoreLocation.framework in Frameworks */,
 				1178261B1BD02FB200C59DCD /* MapKit.framework in Frameworks */,
@@ -448,7 +448,6 @@
 				6981EDBA1ECDF78700651BB1 /* AccountKit.framework in Frameworks */,
 				111FFB811B13C6C7008A13B0 /* Crashlytics.framework in Frameworks */,
 				111F71AF1ADF3ADB0032E710 /* Accounts.framework in Frameworks */,
-				6981EDBD1ECDF78700651BB1 /* FBSDKCoreKit.framework in Frameworks */,
 				111F71AD1ADF3AD20032E710 /* Social.framework in Frameworks */,
 				DA8828FB3C326F8BFB6DC010 /* libPods-Altruus.a in Frameworks */,
 			);
@@ -673,6 +672,7 @@
 			isa = PBXGroup;
 			children = (
 				CA80FDB41E78E38400A9CA70 /* Altruus.entitlements */,
+				69ECC0211F958A12003A3AB4 /* JSON */,
 				CAC6A6AC1E90572A00E51FE7 /* Images */,
 				11A963681DC0088D003F64DB /* Models-v2 */,
 				112EB69C1D8888E70008AC02 /* Intro Controllers */,
@@ -695,9 +695,9 @@
 				11F5E7271ACA101A0009D24A /* ViewController.m */,
 				11F5E7261ACA101A0009D24A /* ViewController.h */,
 				11F5E72C1ACA101A0009D24A /* Images.xcassets */,
+				11F5E7231ACA101A0009D24A /* Altruus.xcdatamodeld */,
 				11F5E7291ACA101A0009D24A /* Main.storyboard */,
 				11F5E72E1ACA101A0009D24A /* LaunchScreen.xib */,
-				11F5E7231ACA101A0009D24A /* Altruus.xcdatamodeld */,
 				11F5E71C1ACA101A0009D24A /* Supporting Files */,
 				11F5E74C1ACC87040009D24A /* constants.h */,
 				CAA73A161E7F4FE600B27D14 /* Servicios.h */,
@@ -871,17 +871,23 @@
 			name = Pods;
 			sourceTree = "<group>";
 		};
+		69ECC0211F958A12003A3AB4 /* JSON */ = {
+			isa = PBXGroup;
+			children = (
+				69ECC0221F958A3D003A3AB4 /* ObtenJSON.h */,
+				69ECC0231F958A3D003A3AB4 /* ObtenJSON.m */,
+			);
+			name = JSON;
+			sourceTree = "<group>";
+		};
 		6CC6839CD1C89947409B221B /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
 				69BF1F721F0090730042A8AB /* SystemConfiguration.framework */,
 				6981EDC11ECE3DE100651BB1 /* OneSignal.framework */,
-				6981EDBF1ECDFA8400651BB1 /* FBSDKShareKit.framework */,
 				6981EDB51ECDF78700651BB1 /* AccountKit.framework */,
 				6981EDB61ECDF78700651BB1 /* AccountKitStrings.bundle */,
 				6981EDB71ECDF78700651BB1 /* Bolts.framework */,
-				6981EDB81ECDF78700651BB1 /* FBSDKCoreKit.framework */,
-				6981EDB91ECDF78700651BB1 /* FBSDKLoginKit.framework */,
 				CAC9E4D91E9AD88D00BF77E9 /* AddressBook.framework */,
 				CAC9E4DA1E9AD88E00BF77E9 /* AddressBookUI.framework */,
 				CAC6A6B31E90FD6B00E51FE7 /* Stripe.framework */,
@@ -922,6 +928,10 @@
 				69F1DC901EDD513A00C3C0E4 /* GiftReceivedDetailViewController.m */,
 				69E6F3951EE4980E00AC6AA2 /* ReceivedDeliveredViewController.h */,
 				69E6F3961EE4980E00AC6AA2 /* ReceivedDeliveredViewController.m */,
+				69A5C31C1FB24356003CBBA8 /* OrganizationsFreeViewController.h */,
+				69A5C31D1FB24356003CBBA8 /* OrganizationsFreeViewController.m */,
+				692DF2001FC1207D0065005D /* LoadingTableViewCell.h */,
+				692DF2011FC1207D0065005D /* LoadingTableViewCell.m */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -1223,6 +1233,7 @@
 				6928C9E51F26D3C400D61891 /* UpdatesGifts.m in Sources */,
 				11A9636B1DC00901003F64DB /* Gift.m in Sources */,
 				11F5E7471ACA23FB0009D24A /* CObutton.m in Sources */,
+				69A5C31E1FB24356003CBBA8 /* OrganizationsFreeViewController.m in Sources */,
 				11F5E78B1AD323580009D24A /* UIScrollView+TPKeyboardAvoidingAdditions.m in Sources */,
 				111F72121AE5BCE70032E710 /* FeedbackViewController.m in Sources */,
 				11EAA0AA1D7F5C940081830A /* GiftInfoViewController.m in Sources */,
@@ -1277,12 +1288,14 @@
 				CAC6A6AB1E90571900E51FE7 /* UIDownPicker.m in Sources */,
 				111FFB761B0BBA65008A13B0 /* Promo.m in Sources */,
 				11F5E7751ACDDDDA0009D24A /* SlideNavigationContorllerAnimatorScaleAndFade.m in Sources */,
+				69ECC0241F958A3D003A3AB4 /* ObtenJSON.m in Sources */,
 				111F720E1AE460300032E710 /* QRScreenViewController.m in Sources */,
 				111FFB7F1B0BC996008A13B0 /* COPromoCell.m in Sources */,
 				695991291EF31A5B00C5E4C6 /* GiftsReceivedTableViewCell.m in Sources */,
 				11EAA0A61D7A22870081830A /* UpdatesTableViewCell.m in Sources */,
 				111501871D1A28A800AF68DD /* UIColor+ALTRUUSAdditions.m in Sources */,
 				6997297F1EB676F800ACE6DF /* Organization.m in Sources */,
+				692DF2021FC1207D0065005D /* LoadingTableViewCell.m in Sources */,
 				11F5E77E1ACDE02B0009D24A /* MenuController.m in Sources */,
 				11F5E7941AD4632B0009D24A /* CODefaultsHelper.m in Sources */,
 				11D0ACF11D403DFB00E7E975 /* MenuTableViewController.m in Sources */,
@@ -1590,11 +1603,12 @@
 		11F5E7231ACA101A0009D24A /* Altruus.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				694BBA261FA82D1E00FE4973 /* Altruus 4.xcdatamodel */,
 				6928C9E71F2E947E00D61891 /* Altruus 3.xcdatamodel */,
 				6928C9E61F2ADA4600D61891 /* Altruus 2.xcdatamodel */,
 				11F5E7241ACA101A0009D24A /* Altruus.xcdatamodel */,
 			);
-			currentVersion = 6928C9E71F2E947E00D61891 /* Altruus 3.xcdatamodel */;
+			currentVersion = 694BBA261FA82D1E00FE4973 /* Altruus 4.xcdatamodel */;
 			path = Altruus.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

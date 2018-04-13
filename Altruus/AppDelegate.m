@@ -54,7 +54,8 @@ static NSString *const kLocalUserCreated = @"createdLocalUser";
     //the color for the text for unselected tabs
     [UITabBarItem.appearance setTitleTextAttributes:@{NSForegroundColorAttributeName : [UIColor altruus_bluegreyColor]} forState:UIControlStateNormal];
     
-    [Stripe setDefaultPublishableKey:@"pk_live_6wEPvr7EvsQLKFuOWwPjRTr8"];
+    [Stripe setDefaultPublishableKey:@"pk_live_6wEPvr7EvsQLKFuOWwPjRTr8"]; //Producción
+    //[Stripe setDefaultPublishableKey:@"pk_test_mbNdkqdHkyz6d5CB9SZYlaUQ"]; //Prueba
 
 
    //[OneSignal setLogLevel:ONE_S_LL_VERBOSE visualLevel:ONE_S_LL_WARN]; //comentè

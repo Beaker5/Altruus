@@ -96,22 +96,8 @@
         AppDelegate *delegate = [AppDelegate sharedAppDelegate];
         NSManagedObjectContext *managedContext = delegate.managedObjectContext;
         
-        //NSString *predicateFormat = [[NSPredicate predicateWithFormat:@"phoneWithoutLada like %@", telephone] predicateFormat];
-        
         NSString *predicateFormat = [[NSPredicate predicateWithFormat:@"origin = %@", @"T"] predicateFormat];
         predicateFormat = [predicateFormat stringByAppendingFormat:@" AND phoneWithoutLada = %@ ", telephone];
-        
-        //NSString *predicateFormat = [[NSPredicate predicateWithFormat:@"origin == %@", @"T"] predicateFormat];
-        //predicateFormat = [predicateFormat stringByAppendingFormat:@" AND phoneNumber contains [cd] %@ ", phoneAux];
-        //NSString *predicateString = [NSString stringWithFormat:@"origin == %@ ", @"T"];
-        
-        
-        //NSString *predicateString = [NSString stringWithFormat:@"origin =  \"T\""];
-        //predicateString = [predicateString stringByAppendingString:@"AND phoneNumber like %@"];
-        //NSPredicate *predicate = [NSPredicate predicateWithFormat:predicateString, phoneAux];
-        
-        //NSLog(@"Original : -%@-, Longitud: %lu", telephone, (unsigned long)[telephone length]);
-        //NSLog(@"Phone: -%@-, Longitud: %lu", phoneAux, (unsigned long)[phoneAux length]);
         
         NSFetchRequest *request = [[NSFetchRequest alloc] init];
         request.entity = [NSEntityDescription entityForName:@"Friend" inManagedObjectContext:managedContext];
@@ -121,8 +107,6 @@
         NSArray *records = [managedContext executeFetchRequest:request error:NULL];
         
         if ([records count] > 0) {
-            //NSLog(@"Telefono: %@", phoneAux);
-            //NSLog(@"%@", [records objectAtIndex:0]);
             return true;
         }else{
             return false;
@@ -236,7 +220,7 @@
     AppDelegate *delegate = [AppDelegate sharedAppDelegate];
     NSManagedObjectContext *managedContext = delegate.managedObjectContext;
     
-    NSString *predicateFormat = [[NSPredicate predicateWithFormat:@"status = %@", @"UNREDEEMED"] predicateFormat];
+    NSString *predicateFormat = [[NSPredicate predicateWithFormat:@"status = %@", @"unredeemed"] predicateFormat];
     
     NSFetchRequest *request = [[NSFetchRequest alloc] init];
     request.entity = [NSEntityDescription entityForName:@"GiftsReceived" inManagedObjectContext:managedContext];

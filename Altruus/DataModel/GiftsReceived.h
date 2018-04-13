@@ -27,6 +27,8 @@
 @property (nullable, nonatomic, copy) NSString *image;
 @property (nullable, nonatomic, copy) NSString *price;
 
+@property (nullable, nonatomic, copy) NSString *redeemCode;
+
 @end
 
 

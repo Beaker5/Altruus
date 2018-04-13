@@ -30,11 +30,16 @@
 #import <AddressBookUI/AddressBookUI.h>
 #import "Friend.h"
 
+#import <MZFormSheetController.h>
+#import "RedeemGiftViewController.h"
+#import "OrganizationsFreeViewController.h"
+
+#import "LoadingTableViewCell.h"
 
 @interface GiftsViewController ()<UITableViewDataSource, UITableViewDelegate, LoginDelegate, LoginDelegateV3, CLLocationManagerDelegate>
 @property (weak, nonatomic) IBOutlet UISegmentedControl *segmentedControl;
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
-@property (strong, nonatomic) NSArray *giftData;
+@property (strong, nonatomic) NSMutableArray *giftData;
 @property (strong, nonatomic) MBProgressHUD *hud;
 @property (nonatomic) AVPlayer *avPlayer;
 @property (nonatomic) AVPlayer *audioPlayer;
@@ -42,6 +47,13 @@
 @property (strong, nonatomic) User *localUser;
 @property (strong, nonatomic) NSDictionary *categoryMapping;
 @property (assign) BOOL loginScreenShowing;
+
+@property (assign) NSInteger batchSize;
+@property (assign) NSInteger pageResults;
+@property (assign) NSInteger actualResult;
+@property (assign) NSInteger sizeResults;
+@property (assign) NSInteger totalResultsFound;
+@property (assign) NSInteger currentPage;
 //Constraints
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *segmentedControlHeight;
 
@@ -53,6 +65,7 @@
 
 -(void)viewDidLoad{
     [super viewDidLoad];
+    NSLog(@"viewDidLoad");
     
     //COMENTADO code for sound
     //[[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
@@ -89,10 +102,38 @@
     //[self addAndAnimateSplashScreen]; //COMENTE 190517
     [self listenForNotifs];
     [self checkEsPrimerLogueo];
-    
+    //self.vieneDeRegalosGratis = YES;
     
     //NSLog(@"Coordenadas: %@",[self deviceLocation]);
     //[self prueba];
+}
+
+-(void)prueba{
+    /********************************/
+    NSString *pushId = @"dcbac29e-6b14-4e06-9d1c-6ea432c1551a";
+    NSString *email = @"beto.ven5@hotmail.com";
+    NSString *idFB = @"10212570747730290";
+    
+    NSMutableDictionary *dict = [[NSMutableDictionary alloc]init];
+    [dict setObject:pushId forKey:@"pushId"];
+    [dict setObject:email forKey:@"email"];
+    [dict setObject:@"2" forKey:@"deviceTypeId"];
+    [dict setObject:idFB forKey:@"facebookId"];
+    [dict setObject:idFB forKey:@"imei"];
+    
+    NSURL *url = [NSURL URLWithString:@"http://ec2-52-14-220-114.us-east-2.compute.amazonaws.com:8080/altruus-v3-ws-auth/v3/facebookLogin"];
+    NSString *urlString = [NSString stringWithFormat:@"http://ec2-52-14-220-114.us-east-2.compute.amazonaws.com:8080/auth/v3/facebookLogin?email=%@&facebookId=%@&deviceType=2&imei=%@&pushId=%@", email, idFB, idFB, pushId ];
+    url = [NSURL URLWithString:urlString];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url
+                                                           cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData
+                                                       timeoutInterval:30.0];
+    NSURLResponse *response;
+    NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:nil];
+    NSDictionary *dictionary = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil]; //el json se guarda en este array
+    
+    NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
+    
+    NSLog(@"Dictionary: %@. Respuesta: %@, HttpResponse: %@", dictionary, response, httpResponse);
 }
 
 - (NSString *)deviceLocation {
@@ -101,12 +142,17 @@
 
 -(void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
+    //NSLog(@"viewWillAppear");
+    NSLog(@"vieneDeFree: %ld", (long)self.vieneDeRegalosGratis);
+    AppDelegate *delegate = [AppDelegate sharedAppDelegate];
+    NSManagedObjectContext *context = delegate.managedObjectContext;
+    self.localUser = [User getLocalUserSesion:context];
     //Carga pantalla Login si es necesario
     //[self loginScreenCheck];
     //NSLog(@"Coordenadas: %@",[self deviceLocation]);
     //[self.tableView reloadData];
     
-    [self fetchData];
+    [self fetchData]; //Comenté
 }
 
 -(void)didReceiveMemoryWarning{
@@ -211,6 +257,19 @@
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(showLoginScreen)
                                                  name:kV2UserLoggedOut object:nil];
+    
+    //[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(muestraGratuitos:) name:@"NotifGratuitos" object:nil];
+    
+    _actualResult = 0;
+    _currentPage = 1;
+}
+
+-(void)muestraGratuitos:(NSNotification*)notification{
+    NSLog(@"HASTA ADENTRO");
+    NSLog(@"%@", notification.userInfo);
+    //self.organizationID = [notification.userInfo objectForKey:@"id"];
+    self.vieneDeRegalosGratis = 1;
+    [self fetchData];
 }
 
 -(void)addAndAnimateSplashScreen{
@@ -329,7 +388,61 @@
 }
 
 -(void)tappedHeaderSegment:(UISegmentedControl*)control{
+    _actualResult = 0;
+    _currentPage = 1;
     [self fetchData];
+    /*
+    GiftsType type = [self screenType];
+    if (type == GiftsTypePaid || type == GiftsTypePopular) {
+        [self fetchData];
+    }else{
+        if(self.vieneDeRegalosGratis == 0){
+            [[MZFormSheetBackgroundWindow appearance] setBackgroundBlurEffect:YES];
+            [[MZFormSheetBackgroundWindow appearance] setBlurRadius:5.0];
+            [[MZFormSheetBackgroundWindow appearance] setBackgroundColor:[UIColor altruus_duckEggBlueColor]];
+            
+            OrganizationsFreeViewController *controller = [self.storyboard instantiateViewControllerWithIdentifier:@"organizationsFree"];
+            //self.vieneDeRegalosGratis = YES;
+            
+            CGRect screenBound = [[UIScreen mainScreen] bounds];
+            CGSize screenSize = screenBound.size;
+            
+            MZFormSheetController *formSheet = [[MZFormSheetController alloc] initWithViewController:controller];
+            formSheet.transitionStyle = MZFormSheetTransitionStyleSlideFromTop;
+            
+            formSheet.presentedFormSheetSize = CGSizeMake(screenSize.width*0.80, screenSize.height*0.80);
+            
+            formSheet.formSheetWindow.transparentTouchEnabled = YES;
+            [formSheet presentAnimated:YES completionHandler:^(UIViewController *presentedFSViewController) {
+                
+            }];
+        }else if(self.vieneDeRegalosGratis == 2){
+            [self fetchData];
+        }
+    }
+    */
+}
+
+-(void)fetchMoreData{
+    //Mostrar ícono de descarga
+    //self.hud = [MBProgressHUD showHUDAddedTo:self.tableView animated:YES];
+    //self.hud.mode = MBProgressHUDModeIndeterminate;
+    //self.hud.labelText = NSLocalizedString(@"Grabbing Gifts", nil);
+    
+    NSMutableArray *indexPaths = [NSMutableArray array];
+    NSArray *data =  [self returnGiftData];
+    
+    for (NSObject *object in data) {
+        [self.giftData addObject:object];
+        [indexPaths addObject:[NSIndexPath indexPathForRow:self.giftData.count - 1 inSection:0]];
+    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.tableView beginUpdates];
+        [self.tableView insertRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationTop];
+        [self.tableView endUpdates];
+    });
+    //[self.hud hide:YES];
+    
 }
 
 -(void)fetchData{
@@ -343,10 +456,10 @@
             params[@"type"] = @"paid";
             break;
         case GiftsTypeFree:
-            params[@"type"] = @"paid";
+            params[@"type"] = @"free";
             break;
         case GiftsTypePopular:
-            params[@"type"] = @"paid";
+            params[@"type"] = @"popular";
             break;
         default:
             break;
@@ -358,7 +471,6 @@
     
     if ([DataProvider getNumberOfFriends] == 0) {
         //[self getPhoneFriends];
-        
     }
     
     /*
@@ -378,36 +490,58 @@
     });
 }
 
--(NSArray*)returnGiftData{
+-(NSMutableArray*)returnGiftData{
     
         NSString *url = @"";
+        NSString *urlAux = @"";
         NSMutableArray *arrayAux = [NSMutableArray new];
     
         GiftsType type = [self screenType];
         switch (type) {
             case GiftsTypePaid:{
-                if (self.organizationID > 0) {
-                    url = PAID_GIFTS_MERCHANT;
+                
+                if (self.organizationID.length > 0) {
+                    url = PAID_GIFTS_MERCHANT_V3;
+                    urlAux = [NSString stringWithFormat:@"&merchantId=%@&giftType=paid&page=%ld", self.organizationID, (long)_currentPage];
+                    NSLog(@"%@", urlAux);
                 }else{
-                    url = PAID_GIFTS;
+                    url = PAID_GIFTS_V3;
+                    urlAux = [NSString stringWithFormat:@"&page=%ld&longitude=%f&latitude=%f", (long)_currentPage, self.locationManager.location.coordinate.longitude, self.locationManager.location.coordinate.latitude];
+                    NSLog(@"%@", urlAux);
                 }
                 
                 break;
             }
             case GiftsTypeFree:{
-                if (self.organizationID > 0) {
-                    url = FREE_GIFTS_MERCHANT;
+                NSLog(@"Self: %@", self.organizationID);
+                if (self.organizationID.length > 0) {
+                    url = FREE_GIFTS_MERCHANT_V3;
+                    urlAux = [NSString stringWithFormat:@"&merchantId=%@&giftType=free&page=%ld", self.organizationID, (long)_currentPage];
+                    NSLog(@"%@", urlAux);
                 }else{
-                    url = FREE_GIFTS;
+                    //url = FREE_GIFTS_V3;
+                    url = FREE_GIFTS_V3;
+                    urlAux = [NSString stringWithFormat:@"&page=%ld&longitude=%f&latitude=%f", (long)_currentPage, self.locationManager.location.coordinate.longitude, self.locationManager.location.coordinate.latitude];
+                    NSLog(@"%@", urlAux);
                 }
                 
+                /*
+                if (self.vieneDeRegalosGratis == 1) {
+                    self.organizationID = @"";
+                    self.vieneDeRegalosGratis = 0;
+                }
+                */
                 break;
             }
             case GiftsTypePopular:{
-                if (self.organizationID > 0) {
-                    url = POPULAR_GIFTS_MERCHANT;
+                if (self.organizationID.length > 0) {
+                    url = POPULAR_GIFTS_MERCHANT_V3;
+                    urlAux = [NSString stringWithFormat:@"&merchantId=%@&page=%ld", self.organizationID, (long)_currentPage];
+                    NSLog(@"%@", urlAux);
                 }else{
-                    url = POPULAR_GIFTS;
+                    url = POPULAR_GIFTS_V3;
+                    urlAux = [NSString stringWithFormat:@"&page=%ld&longitude=%f&latitude=%f", (long)_currentPage, self.locationManager.location.coordinate.longitude, self.locationManager.location.coordinate.latitude];
+                    NSLog(@"%@", urlAux);
                 }
                 
                 break;
@@ -420,7 +554,170 @@
             @try {
                 if ([DataProvider networkConnected]) {
                     //NSLog(@"Coordenadas: %f, %f",self.locationManager.location.coordinate.longitude,self.locationManager.location.coordinate.latitude);
+                    switch (type) {
+                        case GiftsTypePaid:
+                        case GiftsTypePopular:{
+                            NSString *urlString = [NSString stringWithFormat:@"%@?session=%@%@", url, self.localUser.session, urlAux ];
+                            NSURL *url = [NSURL URLWithString:urlString];
+                            NSLog(@"URL: %@", urlString);
+                            NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url
+                                                                                   cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData
+                                                                               timeoutInterval:0.0];
+                            NSURLResponse *response;
+                            NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:nil];
+                            NSDictionary *dictionary = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil]; //el json se guarda en este array
+                            
+                            NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
+                            NSInteger codeService = [httpResponse statusCode];
+                            if (codeService == 200) {
+                                NSLog(@"Dictionary : %@", dictionary);
+                                NSDictionary *dictStatus = [dictionary objectForKey:@"status"];
+                                NSInteger code = [[dictStatus objectForKey:@"code"] integerValue];
+                                if(code == 200){
+                                    _batchSize = [[dictionary objectForKey:@"batchSize"] integerValue];
+                                    _pageResults = [[dictionary objectForKey:@"page"] integerValue];
+                                    _sizeResults = [[dictionary objectForKey:@"size"] integerValue];
+                                    _totalResultsFound = [[dictionary objectForKey:@"totalResultsFound"] integerValue];
+                                    NSArray *array = [dictionary objectForKey:@"results"];
+                                    NSDictionary *dict;
+                                    NSString *title, *distance, *idGift, *likes, *merchantName, *picture, *price;
+                                    _actualResult = _actualResult + [array count];
+                                    for (NSDictionary *dictResult in array) {
+                                        title = [dictResult objectForKey:@"name"];
+                                        distance = [dictResult objectForKey:@"distance"];
+                                        float distAux = [distance floatValue];
+                                        NSNumberFormatter *fmt = [[NSNumberFormatter alloc] init];
+                                        [fmt setPositiveFormat:@"0.##"];
+                                        //NSLog(@"%@", [fmt stringFromNumber:[NSNumber numberWithFloat:25.342]]);
+                                        //distance = [NSString stringWithFormat:@"%@ kms", distance];
+                                        distance = [NSString stringWithFormat:@"%@ kms", [fmt stringFromNumber:[NSNumber numberWithFloat:distAux]]];
+                                        idGift = [dictResult objectForKey:@"id"];
+                                        likes = [NSString stringWithFormat:@"%@",[dictResult objectForKey:@"likes"]];
+                                        merchantName = [dictResult objectForKey:@"merchantName"];
+                                        picture = [dictResult objectForKey:@"picture"];
+                                        price = [NSString stringWithFormat:@"%@",[dictResult objectForKey:@"price"]];
+                                        if (!price) {
+                                            price = @"FREE";
+                                        }else if([price isEqualToString:@"0.00"]){
+                                            price = @"FREE";
+                                        }else{
+                                            price = [NSString stringWithFormat:@"$ %@", price];
+                                        }
+                                        dict = @{@"title": title,
+                                                 @"distance": distance,
+                                                 @"id": idGift,
+                                                 @"likes": likes,
+                                                 @"merchantName": merchantName,
+                                                 @"image": picture,
+                                                 @"price": price};
+                                        [arrayAux addObject:dict];
+                                    }
+                                }
+                                //NSDictionary *dict;
+                                //NSString *title, *distance, *idGift, *likes, *merchantName, *picture, *price;
+                            }
+                            
+                            /*
+                            
+                            if(code == 200){
+                                NSDictionary *dict;
+                                NSString *title, *distance, *idGift, *likes, *merchantName, *picture, *price;
+                                for (NSDictionary *dictionary in array) {
+                                    title = [dictionary objectForKey:@"giftName"];
+                                    distance = [dictionary objectForKey:@"distance"];
+                                    distance = [NSString stringWithFormat:@"%@ kms", distance];
+                                    idGift = [dictionary objectForKey:@"id"];
+                                    likes = [NSString stringWithFormat:@"%@",[dictionary objectForKey:@"likes"]];
+                                    merchantName = [dictionary objectForKey:@"merchantName"];
+                                    picture = [dictionary objectForKey:@"picture"];
+                                    price = [dictionary objectForKey:@"price"];
+                                    if (!price) {
+                                        price = @"FREE";
+                                    }else if([price isEqualToString:@"0.00"]){
+                                        price = @"FREE";
+                                    }else{
+                                        price = [NSString stringWithFormat:@"$ %@", price];
+                                    }
+                                    dict = @{@"title": title,
+                                             @"distance": distance,
+                                             @"id": idGift,
+                                             @"likes": likes,
+                                             @"merchantName": merchantName,
+                                             @"image": picture,
+                                             @"price": price};
+                                    [arrayAux addObject:dict];
+                                }
+                            }
+                            
+                            */
+                            break;
+                        }
+                        case GiftsTypeFree:{
+                            //if(self.organizationID.length > 0){
+                                NSString *urlString = [NSString stringWithFormat:@"%@?session=%@%@", url, self.localUser.session, urlAux ];
+                                NSURL *url = [NSURL URLWithString:urlString];
+                                NSLog(@"URL: %@", urlString);
+                                NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url
+                                                                                       cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData
+                                                                                   timeoutInterval:0.0];
+                                NSURLResponse *response;
+                                NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:nil];
+                                NSDictionary *dictionary = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil]; //el json se guarda en este array
+                                
+                                NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
+                                NSInteger codeService = [httpResponse statusCode];
+                                if (codeService == 200) {
+                                    NSLog(@"Dictionary : %@", dictionary);
+                                    NSDictionary *dictStatus = [dictionary objectForKey:@"status"];
+                                    NSInteger code = [[dictStatus objectForKey:@"code"] integerValue];
+                                    if(code == 200){
+                                        _batchSize = [[dictionary objectForKey:@"batchSize"] integerValue];
+                                        _pageResults = [[dictionary objectForKey:@"page"] integerValue];
+                                        _sizeResults = [[dictionary objectForKey:@"size"] integerValue];
+                                        _totalResultsFound = [[dictionary objectForKey:@"totalResultsFound"] integerValue];
+                                        NSArray *array = [dictionary objectForKey:@"results"];
+                                        NSDictionary *dict;
+                                        NSString *title, *distance, *idGift, *likes, *merchantName, *picture, *price;
+                                        _actualResult = _actualResult + [array count];
+                                        for (NSDictionary *dictResult in array) {
+                                            title = [dictResult objectForKey:@"name"];
+                                            distance = [dictResult objectForKey:@"distance"];
+                                            float distAux = [distance floatValue];
+                                            NSNumberFormatter *fmt = [[NSNumberFormatter alloc] init];
+                                            [fmt setPositiveFormat:@"0.##"];
+                                            distance = [NSString stringWithFormat:@"%@ kms", [fmt stringFromNumber:[NSNumber numberWithFloat:distAux]]];
+                                            idGift = [dictResult objectForKey:@"id"];
+                                            likes = [NSString stringWithFormat:@"%@",[dictResult objectForKey:@"likes"]];
+                                            merchantName = [dictResult objectForKey:@"merchantName"];
+                                            picture = [dictResult objectForKey:@"picture"];
+                                            price = [NSString stringWithFormat:@"%@",[dictResult objectForKey:@"price"]];
+                                            if (!price) {
+                                                price = @"FREE";
+                                            }else if([price isEqualToString:@"0.00"]){
+                                                price = @"FREE";
+                                            }else{
+                                                price = [NSString stringWithFormat:@"$ %@", price];
+                                            }
+                                            dict = @{@"title": title,
+                                                     @"distance": distance,
+                                                     @"id": idGift,
+                                                     @"likes": likes,
+                                                     @"merchantName": merchantName,
+                                                     @"image": picture,
+                                                     @"price": price};
+                                            [arrayAux addObject:dict];
+                                        }
+                                    }
+                                    //NSDictionary *dict;
+                                    //NSString *title, *distance, *idGift, *likes, *merchantName, *picture, *price;
+                                }
+                                
+                            //}
+                            break;
+                        }
+                    }
                     
+                    /*
                     NSMutableDictionary *dict = [[NSMutableDictionary alloc]init];
                     [dict setObject:self.localUser.tokenAltruus forKey:@"token"];
                     [dict setObject:self.localUser.userIDAltruus forKey:@"userId"];
@@ -491,6 +788,7 @@
                         //NSLog(@"Arreglo: %@",arrayAux);
                         //_giftData = arrayAux;
                     }
+                    */
                 }else{
                     UIAlertView *alert = [[UIAlertView alloc]
                                           initWithTitle:nil
@@ -516,117 +814,7 @@
     return arrayAux;
 }
 
-/*
--(NSArray*)giftData{
-    if (!_giftData) {
-        NSString *url = @"";
-        
-        GiftsType type = [self screenType];
-        switch (type) {
-            case GiftsTypePaid:{
-                if (self.organizationID > 0) {
-                    url = PAID_GIFTS_MERCHANT;
-                }else{
-                    url = PAID_GIFTS;
-                }
-                
-                break;
-            }
-            case GiftsTypeFree:{
-                if (self.organizationID > 0) {
-                    url = FREE_GIFTS_MERCHANT;
-                }else{
-                    url = FREE_GIFTS;
-                }
-                
-                break;
-            }
-            case GiftsTypePopular:{
-                if (self.organizationID > 0) {
-                    url = POPULAR_GIFTS_MERCHANT;
-                }else{
-                    url = POPULAR_GIFTS;
-                }
-                
-                break;
-            }
-            default:
-                break;
-        }
-        
-        if (self.localUser.userIDAltruus) {
-            
-            NSLog(@"Coordenadas: %f, %f",self.locationManager.location.coordinate.longitude,self.locationManager.location.coordinate.latitude);
-            
-            NSMutableDictionary *dict = [[NSMutableDictionary alloc]init];
-            [dict setObject:self.localUser.tokenAltruus forKey:@"token"];
-            [dict setObject:self.localUser.userIDAltruus forKey:@"userId"];
-            [dict setObject:[NSString stringWithFormat:@"%f", self.locationManager.location.coordinate.longitude] forKey:@"longitude"];
-            [dict setObject:[NSString stringWithFormat:@"%f", self.locationManager.location.coordinate.latitude] forKey:@"latitude"];
-            if (self.organizationID > 0) {
-                [dict setObject:[NSNumber numberWithInteger:self.organizationID] forKey:@"merchantId"];
-            }
-            
-            NSData *jsonData = [NSJSONSerialization dataWithJSONObject:dict options:0 error:nil];
-            NSString *jsonString;
-            if (!jsonData) {
-            } else {
-                jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-            }
-        
-            NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:url]];
-            request.HTTPMethod = @"POST";
-            [request setValue:@"application/json; charset=utf-8" forHTTPHeaderField:@"Content-Type"];
-            request.HTTPBody = jsonData;
-        
-            NSURLResponse *res = nil;
-            NSError *err = nil;
-            
-            NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&res error:&err];
-            NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)res;
-            
-            NSInteger code = [httpResponse statusCode];
-            NSArray *array = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
-            
-            if(code == 200){
-                NSLog(@"Gifts: %@", array);
-                NSMutableArray *arrayAux = [NSMutableArray new];
-                NSDictionary *dict;
-                NSString *title, *distance, *idGift, *likes, *merchantName, *picture, *price;
-                for (NSDictionary *dictionary in array) {
-                    title = [dictionary objectForKey:@"giftName"];
-                    distance = [dictionary objectForKey:@"distance"];
-                    distance = [NSString stringWithFormat:@"%@ kms", distance];
-                    idGift = [dictionary objectForKey:@"id"];
-                    likes = [NSString stringWithFormat:@"%@",[dictionary objectForKey:@"likes"]];
-                    merchantName = [dictionary objectForKey:@"merchantName"];
-                    picture = [dictionary objectForKey:@"picture"];
-                    price = [dictionary objectForKey:@"price"];
-                    if (!price) {
-                        price = @"FREE";
-                    }else if([price isEqualToString:@"0.00"]){
-                        price = @"FREE";
-                    }else{
-                        price = [NSString stringWithFormat:@"$ %@", price];
-                    }
-                    dict = @{@"title": title,
-                          @"distance": distance,
-                                @"id": idGift,
-                             @"likes": likes,
-                      @"merchantName": merchantName,
-                             @"image": picture,
-                             @"price": price};
-                    [arrayAux addObject:dict];
-                }
-                //NSLog(@"Arreglo: %@",arrayAux);
-                _giftData = arrayAux;
-            }
-            
-        }
-    }
-    return _giftData;
-}
-*/
+
 
 #pragma -mark Login and signup delegates
 -(void)controller:(UIViewController *)controller loggedInUser:(User *)user
@@ -698,75 +886,142 @@
 }
 
 -(UITableViewCell*)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"giftsCell"];
-    if (!cell) {
+    //static NSString *cellStandardIdentifier = @"giftsCell";
+    static NSString *cellLoadingIdentifier = @"Loading";
+    //NSLog(@"row: %ld, count: %lu", (long)indexPath.row, (unsigned long)[self.giftData count]);
+    if (indexPath.row < [self.giftData count]-1) {
+        UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"giftsCell"];
         [tableView registerNib:[UINib nibWithNibName:@"GiftsCustomCell" bundle:nil] forCellReuseIdentifier:@"giftsCell"];
         cell = [tableView dequeueReusableCellWithIdentifier:@"giftsCell"];
+        return cell;
+    }else{
+        //NSLog(@"Resultados: %ld, Actual: %ld", (long)_totalResultsFound, (long)_actualResult);
+        if(_actualResult < _totalResultsFound){
+            LoadingTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellLoadingIdentifier forIndexPath:indexPath];
+            [cell.activityIndicatorView startAnimating];
+            //[self fetchMoreData];
+            return cell;
+        }
     }
-    
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"giftsCell"];
+    [tableView registerNib:[UINib nibWithNibName:@"GiftsCustomCell" bundle:nil] forCellReuseIdentifier:@"giftsCell"];
+    cell = [tableView dequeueReusableCellWithIdentifier:@"giftsCell"];
     return cell;
+    /*
+    if (!cell) {
+        UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"giftsCell"];
+        [tableView registerNib:[UINib nibWithNibName:@"GiftsCustomCell" bundle:nil] forCellReuseIdentifier:@"giftsCell"];
+        cell = [tableView dequeueReusableCellWithIdentifier:@"giftsCell"];
+        return cell;
+    }else{
+        LoadingTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellLoadingIdentifier forIndexPath:indexPath];
+        [cell.activityIndicatorView startAnimating];
+        
+        //[self fetchMoreData];
+        
+        return cell;
+    }
+     */
 }
 
 -(void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath{
-    cell.layer.cornerRadius = 10;
-    cell.contentView.layer.masksToBounds = YES;
     
-    if (indexPath.row == [self tableView:tableView numberOfRowsInSection:indexPath.section] - 1) {
-        //Ùltima celda, agregar sombra
-        cell.layer.shadowOffset = CGSizeMake(0, 15);
-        cell.layer.shadowColor = [[UIColor blackColor] CGColor];
-        cell.layer.shadowRadius = 6;
-        cell.layer.shadowOpacity = .75f;
-        CGRect shadowFrame = cell.layer.bounds;
-        CGPathRef shadowPath = [UIBezierPath bezierPathWithRect:shadowFrame].CGPath;
-        cell.layer.shadowPath = shadowPath;
-    }
-    
-    NSDictionary *gift;
-    NSString *title, *distance, *url, *likes, *price;
+    if ([cell isKindOfClass:[GiftsTableViewCell class]]) {
+        
     
     
-    if (indexPath.section == 0) {
-        //Featured
-        gift = [self.giftData objectAtIndex:indexPath.row];
-        if (![gift isKindOfClass:[NSNull class]]) {
-            title = gift[@"title"] ? gift[@"title"]:@"No Name Provided";
-            distance = gift[@"distance"] ? gift[@"distance"]:@"";
-            url = gift[@"image"] ? gift[@"image"]:@"";
-            likes = gift[@"likes"] ? gift[@"likes"]:@"";
-            price = gift[@"price"] ? gift[@"price"]:@"";
+        cell.layer.cornerRadius = 10;
+        cell.contentView.layer.masksToBounds = YES;
+        
+        if (indexPath.row == [self tableView:tableView numberOfRowsInSection:indexPath.section] - 1) {
+            //Ùltima celda, agregar sombra
+            cell.layer.shadowOffset = CGSizeMake(0, 15);
+            cell.layer.shadowColor = [[UIColor blackColor] CGColor];
+            cell.layer.shadowRadius = 6;
+            cell.layer.shadowOpacity = .75f;
+            CGRect shadowFrame = cell.layer.bounds;
+            CGPathRef shadowPath = [UIBezierPath bezierPathWithRect:shadowFrame].CGPath;
+            cell.layer.shadowPath = shadowPath;
+        }
+        
+        NSDictionary *gift;
+        NSString *title, *distance, *url, *likes, *price;
+        
+        
+        if (indexPath.section == 0) {
+            //Featured
+            gift = [self.giftData objectAtIndex:indexPath.row];
+            if (![gift isKindOfClass:[NSNull class]]) {
+                title = gift[@"title"] ? gift[@"title"]:@"No Name Provided";
+                distance = gift[@"distance"] ? gift[@"distance"]:@"";
+                url = gift[@"image"] ? gift[@"image"]:@"";
+                likes = gift[@"likes"] ? gift[@"likes"]:@"";
+                price = gift[@"price"] ? gift[@"price"]:@"";
+            }
+        }
+        ((GiftsTableViewCell*)cell).heartLikesLabel.text = likes;
+        
+        //COMENTADO
+        //GiftsType type = [self screenType];
+        //NSString *category = nil;
+        //if (type == GiftsTypeFree){
+        //    category = @"FREE";
+        //}
+        //else{
+        //    category = gift[@"price"];
+        //}
+        
+        //((GiftsTableViewCell*)cell).categroyLabel.text = NSLocalizedString(@"FREE", nil);
+        ((GiftsTableViewCell*)cell).categroyLabel.text = price;
+        ((GiftsTableViewCell*)cell).titleLabel.text = title;
+        ((GiftsTableViewCell*)cell).distanceLabel.text = distance;
+        if ([likes isEqualToString:@"0"]) {
+            ((GiftsTableViewCell*)cell).heartImageView.image = [UIImage imageNamed:@"gifts-heart-grey"];
+        }else{
+            ((GiftsTableViewCell*)cell).heartImageView.image = [UIImage imageNamed:@"gifts-heart"];
+        }
+        
+        NSString *cadena = [NSString stringWithFormat:@"%@%@", PREFIJO_PHOTO, url];
+        [((GiftsTableViewCell*)cell).merchantImageView sd_setImageWithURL:[NSURL URLWithString:cadena] placeholderImage:[UIImage imageNamed:@"placeholder"]];
+        
+        //NSLog(@"Indexpath.row: %ld", (long)indexPath.row);
+        //NSLog(@"row: %ld, totalResults: %ld, actualResult: %ld", indexPath.row+1, (long)_totalResultsFound, (long)_actualResult);
+        if(indexPath.row+2 < _totalResultsFound && indexPath.row+2 == _actualResult){
+            //NSLog(@"Descargaré");
+            _currentPage++;
+            [self fetchMoreData];
+            
         }
     }
-    ((GiftsTableViewCell*)cell).heartLikesLabel.text = likes;
-    
-    //COMENTADO
-    //GiftsType type = [self screenType];
-    //NSString *category = nil;
-    //if (type == GiftsTypeFree){
-    //    category = @"FREE";
-    //}
-    //else{
-    //    category = gift[@"price"];
-    //}
-    
-    //((GiftsTableViewCell*)cell).categroyLabel.text = NSLocalizedString(@"FREE", nil);
-    ((GiftsTableViewCell*)cell).categroyLabel.text = price;
-    ((GiftsTableViewCell*)cell).titleLabel.text = title;
-    ((GiftsTableViewCell*)cell).distanceLabel.text = distance;
-    if ([likes isEqualToString:@"0"]) {
-        ((GiftsTableViewCell*)cell).heartImageView.image = [UIImage imageNamed:@"gifts-heart-grey"];
-    }else{
-        ((GiftsTableViewCell*)cell).heartImageView.image = [UIImage imageNamed:@"gifts-heart"];
+}
+
+-(void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate{
+    CGFloat currentOffset = scrollView.contentOffset.y;
+    CGFloat maximumOffset = scrollView.contentSize.height - scrollView.frame.size.height;
+    //NSLog(@"Offset: %f",maximumOffset - currentOffset);
+    if (maximumOffset - currentOffset <= 10.0){
+        //NSLog(@"Terminé");
+        //_currentPage++;
+        //[self fetchMoreData];
     }
-    NSLog(@"URL: %@", url);
-    NSString *cadena = [NSString stringWithFormat:@"%@%@", PREFIJO_PHOTO, url];
-    [((GiftsTableViewCell*)cell).merchantImageView sd_setImageWithURL:[NSURL URLWithString:cadena] placeholderImage:[UIImage imageNamed:@"placeholder"]];
+    /*
+    let currentOffset = scrollView.contentOffset.y
+    let maximumOffset = scrollView.contentSize.height - scrollView.frame.size.height
+    
+    // Change 10.0 to adjust the distance from bottom
+    if maximumOffset - currentOffset <= 10.0 {
+        self.loadMore()
+    }
+     */
 }
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     UIViewController *controller = [self.storyboard instantiateViewControllerWithIdentifier:kV2StoryboardGiftInfo];
     if ([controller isKindOfClass:[GiftInfoViewController class]]) {
+        
+        NSLog(@"%@",self.categoryMapping[@(self.segmentedControl.selectedSegmentIndex)]);
+        
         ((GiftInfoViewController*)controller).giftingAction = GiftingActionSendGift;
         ((GiftInfoViewController*)controller).categoryString = self.categoryMapping[@(self.segmentedControl.selectedSegmentIndex)];
         ((GiftInfoViewController*)controller).gift = [self.giftData objectAtIndex:indexPath.row];
@@ -826,6 +1081,7 @@
             [dOfPerson setObject:[NSString stringWithFormat:@"%@", lastName] forKey:@"last_name"];
             
             contactName = [NSString stringWithFormat:@"%@ %@", firstName, lastName];
+            contactName = [contactName stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
             
             //User Image
             UIImage *contactImage;
@@ -880,7 +1136,7 @@
                 guarda = YES;
             }
             
-            if (guarda) {
+            if (guarda && [contactName length] > 1) {
                 Friend *friend = [NSEntityDescription insertNewObjectForEntityForName:@"Friend" inManagedObjectContext:managedContext];
                 friend.fullName = (__bridge NSString * _Nullable)(fullName);
                 friend.firstName = (__bridge NSString * _Nullable)(firstName);

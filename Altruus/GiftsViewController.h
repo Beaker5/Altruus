@@ -23,7 +23,7 @@ typedef NS_ENUM(NSInteger, GiftsType)
 @property (assign) BOOL comingFromNavPush;
 @property (assign) BOOL dontShowSearch;
 
-@property (assign, nonatomic) NSInteger organizationID;
+@property (strong, nonatomic) NSString *organizationID;
 
 @property (strong,nonatomic) NSString *gifterName;
 @property (strong,nonatomic) NSString *userReceivingGift;
@@ -32,6 +32,10 @@ typedef NS_ENUM(NSInteger, GiftsType)
 
 @property (assign, nonatomic) BOOL vieneDeAmigos;
 
+@property (assign, nonatomic) NSInteger vieneDeRegalosGratis;
+//0 Es la pantalla inicial, debe de cargar popup
+//1 Viene de la pantalla de regalos gratis
+//2 Viene del perfil del Negocio
 
 
 @end

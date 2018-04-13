@@ -12,7 +12,6 @@
 #import "Servicios.h"
 #import "DataProvider.h"
 
-//@interface NewCardViewController ()<STPPaymentCardTextFieldDelegate, NewCardViewControllerDelegate>
 @interface NewCardViewController ()<STPPaymentCardTextFieldDelegate>
 
 @property (strong, nonatomic) STPPaymentCardTextField *paymentTextField;
@@ -26,6 +25,8 @@
 
 @property (nonatomic, weak) IBOutlet UITextField *textField;
 @property (nonatomic, weak) IBOutlet UIButton *addCardButton;
+
+@property (nonatomic, weak) NSString *messageService;
 
 
 @end
@@ -57,21 +58,10 @@
     
     self.addCardButton.layer.cornerRadius = 10;
     
-    // Setup payment view
-    //STPPaymentCardTextField *paymentTextField = [[STPPaymentCardTextField alloc] init];
-    //paymentTextField.delegate = self;
-    //self.paymentTextField = paymentTextField;
-    /*
-    self.paymentTextField = [[STPPaymentCardTextField alloc] init];
-    self.paymentTextField.delegate =self;
-    self.paymentTextField.frame = CGRectMake(200, 300, 200, 40);
-    [self.view addSubview:self.paymentTextField];
-    */
+
     STPPaymentCardTextField *paymentTextField = [[STPPaymentCardTextField alloc] init];
     paymentTextField.delegate = self;
-    //paymentTextField.cursorColor = [UIColor purpleColor];
     self.paymentTextField = paymentTextField;
-    //self.paymentTextField.frame = CGRectMake(200, 200, 200, 40);
     
     CGFloat width = self.view.frame.size.width;
     width = width - self.textField.frame.size.width;
@@ -80,17 +70,13 @@
     self.paymentTextField.frame = CGRectMake(width, self.textField.frame.origin.y, self.textField.frame.size.width, self.textField.frame.size.height);
     [self.view addSubview:paymentTextField];
     
-    
-    //self.paymentTextField = [[STPPaymentCardTextField alloc] init];
-    //self.paymentTextField.delegate = self;
-    
-    
-    
     // Setup Activity Indicator
     UIActivityIndicatorView *activityIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
     activityIndicator.hidesWhenStopped = YES;
     self.activityIndicator = activityIndicator;
     [self.view addSubview:activityIndicator];
+    
+    self.messageService = @"";
 }
 
 -(IBAction)tappedSaveCardButton:(UIButton*)sender{
@@ -105,7 +91,7 @@
     [[STPAPIClient sharedClient] createTokenWithCard:self.paymentTextField.cardParams
                                           completion:^(STPToken *token, NSError *error) {
                                               if (error) {
-                                                  [self.delegate exampleViewController:self didFinishWithError:error];
+                                                  [self.delegate exampleViewController:self didFinishWithError:error andMessage:@"Error"];
                                               }
                                               @try {
                                                   if ([DataProvider networkConnected]) {
@@ -114,7 +100,7 @@
                                                       if (code == 200) {
                                                           [self.delegate exampleViewController:self didFinishWithMessage:@"Card Added" andLast4:self.paymentTextField.cardParams.last4];
                                                       }else{
-                                                          [self.delegate exampleViewController:self didFinishWithError:error];
+                                                          [self.delegate exampleViewController:self didFinishWithError:error andMessage:self.messageService];
                                                       }
                                                   }else{
                                                       UIAlertView *alert = [[UIAlertView alloc]
@@ -137,83 +123,48 @@
                                               
                                               
                                           }];
-    //if(![self.paymentTextField isValid]){ return;
-        /*
-        if (![self.paymentTextField isValid]) {
-            NSLog(@"No es válida");
-            return;
-        }
-        if (![Stripe defaultPublishableKey]) {
-            NSError *error = [NSError errorWithDomain:StripeDomain
-                                                 code:STPInvalidRequestError
-                                             userInfo:@{
-                                                        NSLocalizedDescriptionKey: @"Please specify a Stripe Publishable Key in Constant.h"
-                                                        }];
-            [self.delegate newCardViewController:self didFinish:error];
-            return;
-        }
-        [self.activityIndicator startAnimating];
-        [[STPAPIClient sharedClient] createTokenWithCard:self.paymentTextField.card
-                                              completion:^(STPToken *token, NSError *error) {
-                                                  [self.activityIndicator stopAnimating];
-                                                  if (error == nil) {
-                                                      [self.delegate newCardViewController:self didFinish:error];
-                                                  }
-                                              }];
-
-       */
-    //}
-/*
-    [self.activityIndicator startAnimating];
-    [[STPAPIClient sharedClient] createTokenWithCard:self.paymentTextField.card
-                                          completion:^(STPToken * _Nullable token, NSError * _Nullable error) {
-                                              [self.activityIndicator stopAnimating];
-                                              if (error == nil) {
-                                                  [self.delegate newCardViewController:self didFinish:error];
-                                              }
-                                          }];
- */
+    
 }
 
 -(NSInteger)guardaTarjeta:(NSString*)token{
-    /*****************************************************************************/
     NSMutableDictionary *dict = [[NSMutableDictionary alloc]init];
     [dict setObject:self.localUser.tokenAltruus forKey:@"token"];
     [dict setObject:self.localUser.userIDAltruus forKey:@"userId"];
-    //ELIMINAR
-    //[dict setObject:@"kj4mopn72lbqts89k50p0k7ouu" forKey:@"token"];
-    //[dict setObject:@"5" forKey:@"userId"];
     [dict setObject:token forKey:@"cardToken"];
-    NSLog(@"Token: %@", token);
     
+    NSString *urlString = [NSString stringWithFormat:@"%@?session=%@&cardToken=%@", NEW_CARD_V3, self.localUser.session, token ];
+    NSURL *url = [NSURL URLWithString:urlString];
+    NSLog(@"URL: %@, URLSTRING: %@", urlString, url);
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url
+                                                           cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData
+                                                       timeoutInterval:0.0];
+    NSURLResponse *response;
+    NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:nil];
+    NSDictionary *dictionary = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil]; //el json se guarda en este array
     
-    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:dict options:0 error:nil];
+    NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
+    NSInteger codeService = [httpResponse statusCode];
+    NSInteger code = 0;
+    NSString *message;
     
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:NEW_CARD]];
-    request.HTTPMethod = @"POST";
-    [request setValue:@"application/json; charset=utf-8" forHTTPHeaderField:@"Content-Type"];
-    request.HTTPBody = jsonData;
+    if (codeService == 200) {
+        NSLog(@"Dictionary : %@", dictionary);
+        code = [[dictionary objectForKey:@"code"] integerValue];
+        message = [dictionary objectForKey:@"message"];
+        self.messageService = message;
+        return code;
+    }else{
+        return codeService;
+    }
     
-    NSURLResponse *res = nil;
-    NSError *err = nil;
-    
-    [NSURLConnection sendSynchronousRequest:request returningResponse:&res error:&err];
-    NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)res;
-    
-    NSInteger code = [httpResponse statusCode];
-    NSLog(@"Código: %ld, err: %@", (long)code, res);
-    
-    return code;
 }
 
 -(void)paymentCardTextFieldDidChange:(STPPaymentCardTextField *)textField{
-    //NSLog(textField.isValid ? @"YES" : @"NO");
+    if(textField.isValid){
+        [textField resignFirstResponder];
+    }
 }
-/*
-- (void)paymentCardTextFieldDidChange:(nonnull STPPaymentCardTextField *)textField {
-    NSLog(textField.isValid ? @"YES" : @"NO");
-}
-*/
+
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.

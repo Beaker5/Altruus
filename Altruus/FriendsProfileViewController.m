@@ -93,6 +93,8 @@
     
     self.navigationItem.title = [NSString stringWithFormat:@"%@'s Profile", self.friend.firstName];
     
+    self.navigationItem.title = NSLocalizedString(@"Profile", nil);
+    
     self.backContainerView.layer.cornerRadius = 5;
     self.containerView.layer.shadowColor = [[UIColor altruus_darkSkyBlue10Color] CGColor];
     self.backContainerView.layer.shadowOpacity = 0.7;
@@ -118,26 +120,7 @@
             view.backgroundColor = [UIColor clearColor];
         }
     }
-    /*
-    for (UIView *view in [self.containerView subviews]) {
-        //Asignar foto de perfil
-        if ([view isKindOfClass:[UIImageView class]]) {
-            //[((UIImageView*)view) sd_setImageWithURL:self.friend.imageUrl placeholderImage:nil];
-            [((UIImageView*)view) sd_setImageWithURL:self.friend.imageUrl placeholderImage:[UIImage imageNamed:@"Logo1"]];
-        }
-        
-        if (view.tag == 22) {
-            for (UIView *view2 in view.subviews) {
-                if (view2.tag == 1 || view2.tag == 2 || view2.tag == 2) {
-                    break;
-                }
-                if ([view2 isKindOfClass:[UIImageView class]]) {
-                    [((UIImageView*) view2) sd_setImageWithURL:[NSURL URLWithString:@"http://loremflickr.com/320/240"] placeholderImage:nil];
-                }
-            }
-        }
-    }
-     */
+    
     if (![self.friend.photo isEqualToString:@""]) {
         NSData *imageData = [NSData dataWithContentsOfURL:[NSURL URLWithString:self.friend.photo]];
         self.profileImageView.image = [UIImage imageWithData:imageData];
@@ -180,20 +163,7 @@
 }
 
 -(IBAction)tappedSendGiftButton:(UIButton*)sender{
-    /*
-    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"gifts" bundle:nil];
-    UIViewController *controller = [storyboard instantiateViewControllerWithIdentifier:@"giftsHome"];
-    if ([controller isKindOfClass:[GiftsViewController class]]) {
-        ((GiftsViewController*)controller).removeSplashScreenIntro = YES;
-        ((GiftsViewController*)controller).showBackButton = YES;
-        ((GiftsViewController*)controller).dontShowSearch = YES;
-        ((GiftsViewController*)controller).comingFromNavPush = YES;
-        ((GiftsViewController*)controller).userReceivingGift = @"Beto";
-        ((GiftsViewController*)controller).friend = self.friend;
-        
-    }
-    [self.navigationController pushViewController:controller animated:YES];
-    */
+    
     //Organizations
     UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"gifts" bundle:nil];
     UIViewController *controller = [storyboard instantiateViewControllerWithIdentifier:@"Organizations"];

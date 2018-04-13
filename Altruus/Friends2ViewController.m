@@ -138,7 +138,7 @@
     
     [self.segmentedControl addTarget:self action:@selector(tappedHeaderSegment:) forControlEvents:UIControlEventValueChanged];
     
-    [self.segmentedControl setTitle:NSLocalizedString(@"ALTRÜUS", nil) forSegmentAtIndex:0];
+    [self.segmentedControl setTitle:NSLocalizedString(@"ALTRÜUS USERS", nil) forSegmentAtIndex:0];
     [self.segmentedControl setTitle:NSLocalizedString(@"PHONE CONTACTS", nil) forSegmentAtIndex:1];
     
     self.segmentedControl.selectedSegmentIndex = 1;
@@ -147,13 +147,7 @@
     self.searchBar.delegate = self;
     
     
-    // add search icon
-    //COMENTADO
-    //FAKIonIcons *searchIcon = [FAKIonIcons iosSearchStrongIconWithSize:30];
-    //[searchIcon addAttribute:NSForegroundColorAttributeName value:[UIColor altruus_darkSkyBlueColor]];
-    //UIImage *searchImage = [searchIcon imageWithSize:CGSizeMake(30, 30)];
-    //self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithImage:searchImage style:UIBarButtonItemStylePlain target:self action:@selector(tappedSearch)];
-    
+   
     self.tableview.backgroundColor = [UIColor altruus_duckEggBlueColor];
     self.tableview.layer.cornerRadius = 5;
 }
@@ -164,111 +158,51 @@
     self.hud.mode = MBProgressHUDModeIndeterminate;
     self.hud.labelText = NSLocalizedString(@"Getting Friends", nil);
     
-    /*
-    [User fetchFriendsOrFollowersOnScreen:FriendScreenFriends
-                                withBlock:^(BOOL success, NSArray *friends) {
-                                    [self.hud hide:YES];
-                                    if (success) {
-                                        NSMutableArray *tempList = [@[] mutableCopy];
-                                        for (NSDictionary *data in friends) {
-                                            Friends *friend = [Friends friendFromData:data];
-                                            if (friend) {
-                                                [tempList addObject:friend];
-                                            }
-                                        }
-                                        self.data = [tempList copy];
-                                        self.friendCount = [NSNumber numberWithInteger:self.data.count];
-                                        [self.tableview reloadData];
-                                    }
-                                }];
-    */
-    //NSMutableDictionary *contactList = [self getPhoneFriends];
+  
     [DataProvider deleteFriendsRecords];
     [self getAltruusFriends];
     [self getPhoneFriends];
-    /*
-    dispatch_async(dispatch_get_main_queue(), ^{
-        self.data = [self getFriendsFromTelephone:nil];
-        
-        self.friendCount = [NSNumber numberWithInteger:self.data.count];
-        [self.tableview reloadData];
-        [self.hud hide:YES];
-    });
-     */
-    
-    /*
-    NSArray *sortedKeys = [[contactList allKeys] sortedArrayUsingSelector: @selector(compare:)];
-    self.friendsKeys = [NSMutableArray arrayWithArray:sortedKeys];
-    self.friendList = contactList;
-    
-    NSMutableArray *tempList = [@[] mutableCopy];
-    for (NSString *key in self.friendsKeys) {
-        Friends *friend = [Friends friendFromData:[self.friendList objectForKey:key]];
-        if (friend) {
-            [tempList addObject:friend];
-        }
-    }
-    dispatch_async(dispatch_get_main_queue(), ^{
-        self.data = [tempList copy];
-        
-        self.friendCount = [NSNumber numberWithInteger:self.data.count];
-        [self.tableview reloadData];
-        [self.hud hide:YES];
-    });*/
-    /*
-    dispatch_async(dispatch_get_main_queue(), ^{
-        
-        self.friendCount = [NSNumber numberWithInteger:self.data.count];
-        [self.tableview reloadData];
-        [self.hud hide:YES];
-    });*/
 }
 
 -(NSArray*)getFriendsFromAltruus:(NSString*)substring{
     NSMutableArray *friends = [NSMutableArray new];
     @try {
         if ([DataProvider networkConnected]) {
-            if ([substring length] >= 3) {
+            if ([substring length] >= 1) {
                 AppDelegate *delegate = [AppDelegate sharedAppDelegate];
                 NSManagedObjectContext *context = delegate.managedObjectContext;
                 self.localUser = [User getLocalUserSesion:context];
                 
-                NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
-                [dict setObject:self.localUser.tokenAltruus forKey:@"token"];
-                [dict setObject:self.localUser.userIDAltruus forKey:@"userId"];
-                [dict setObject:substring forKey:@"name"];
+                substring = [substring stringByReplacingOccurrencesOfString:@" " withString:@"%20"];
                 
-                NSData *jsonData = [NSJSONSerialization dataWithJSONObject:dict options:0 error:nil];
-                NSString *jsonString;
-                if (!jsonData) {
-                } else {
-                    jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-                }
+                NSString *urlString = [NSString stringWithFormat:@"%@?session=%@&name=%@", SEARCH_USER_BY_NAME_V3, self.localUser.session, substring];
+                NSURL *url = [NSURL URLWithString:urlString];
+                NSLog(@"URL: %@", urlString);
+                NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url
+                                                                       cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData
+                                                                   timeoutInterval:0.0];
+                NSURLResponse *response;
+                NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:nil];
+                NSDictionary *dictionary = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil]; //el json se guarda en este array
                 
-                NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:SEARCH_USER_BY_NAME]];
-                request.HTTPMethod = @"POST";
-                [request setValue:@"application/json; charset=utf-8" forHTTPHeaderField:@"Content-Type"];
-                request.HTTPBody = jsonData;
-                
-                NSURLResponse *res = nil;
-                NSError *err = nil;
-                
-                NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&res error:&err];
-                NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)res;
-                
-                NSInteger code = [httpResponse statusCode];
-                NSArray *array = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
-                NSLog(@"-----------------------------------------------------------------------------------");
-                NSLog(@"Codigo: %ld, Diccionario Updates: %@", (long)code, array);
-                NSLog(@"-----------------------------------------------------------------------------------");
-                if (code == 200) {
-                    for (NSDictionary *dictionary in array) {
-                        Friends *f = [Friends altruusFriendFromData:dictionary];
-                        if (f) {
-                            [friends addObject:f];
+                NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
+                NSInteger codeService = [httpResponse statusCode];
+                if (codeService == 200) {
+                    NSLog(@"Dictionary : %@", dictionary);
+                    NSDictionary *dictStatus = [dictionary objectForKey:@"status"];
+                    NSInteger code = [[dictStatus objectForKey:@"code"] integerValue];
+                    if(code == 200){
+                        NSArray *array = [dictionary objectForKey:@"results"];
+                        NSLog(@"Array: %@",array);
+                        for (NSDictionary *dict in array) {
+                            Friends *f = [Friends altruusFriendFromData:dict];
+                            if (f) {
+                                [friends addObject:f];
+                            }
                         }
                     }
                 }
+                
             }
         }else{
             UIAlertView *alert = [[UIAlertView alloc]
@@ -304,11 +238,7 @@
         [dict setObject:friend.lastName forKey:@"last_name"];
         [dict setObject:friend.phoneNumber forKey:@"phoneNumber"];
         [dict setObject:friend.photo forKey:@"photo"];
-        /*
-        if (friend.photo) {
-            [dict setObject:friend.photo forKey:@"photo"];
-        }
-         */
+       
         
         Friends *f = [Friends friendFromData:dict];
         if (f) {
@@ -328,6 +258,8 @@
     NSMutableDictionary *contactList = [NSMutableDictionary new];
     AppDelegate *delegate = [AppDelegate sharedAppDelegate];
     NSManagedObjectContext *managedContext = delegate.managedObjectContext;
+    
+    __block NSMutableString *cadenaTelefonos = [NSMutableString new];
     
     ABAddressBookRef addressBook = ABAddressBookCreate();
     ABAddressBookRequestAccessWithCompletion(addressBook, ^(bool granted, CFErrorRef error) {
@@ -358,6 +290,7 @@
             }
             
             fullName = (__bridge CFStringRef)([NSString stringWithFormat:@"%@ %@", firstName, lastName]);
+            
             //NSLog(@"Fullname : %@", fullName);
             
             [dOfPerson setObject:[NSString stringWithFormat:@"%@ %@", firstName, lastName] forKey:@"name"];
@@ -365,7 +298,7 @@
             [dOfPerson setObject:[NSString stringWithFormat:@"%@", lastName] forKey:@"last_name"];
             
             contactName = [NSString stringWithFormat:@"%@ %@", firstName, lastName];
-            
+            contactName = [contactName stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
             //User Image
             UIImage *contactImage;
             NSData *dataImage = nil;
@@ -385,12 +318,10 @@
                 mobileLabel = (__bridge NSString*)ABMultiValueCopyLabelAtIndex(phones, i);
                 //NSLog(@"%@", mobileLabel);
                 if([mobileLabel isEqualToString:(NSString *)kABPersonPhoneMobileLabel] || [mobileLabel isEqualToString:@"Móvil"] || [mobileLabel isEqualToString:@"Celular"]){
-                    //[dOfPerson setObject:(__bridge NSString*)ABMultiValueCopyValueAtIndex(phones, i) forKey:@"phone"];
                     mobileNumber = (__bridge NSString*)ABMultiValueCopyValueAtIndex(phones, i);
                     hasMobile = YES;
                     
                 }else if ([mobileLabel isEqualToString:(NSString*)kABPersonPhoneIPhoneLabel]){
-                    //[dOfPerson setObject:(__bridge NSString*)ABMultiValueCopyValueAtIndex(phones, i) forKey:@"phone"];
                     iPhoneNumber = (__bridge NSString*)ABMultiValueCopyValueAtIndex(phones, i);
                     hasIphone = YES;
                     break ;
@@ -418,7 +349,7 @@
                 guarda = YES;
             }
             
-            if (guarda) {
+            if (guarda && [contactName length] > 1) {
                 NSArray* words = [celNumber componentsSeparatedByCharactersInSet :[NSCharacterSet whitespaceAndNewlineCharacterSet]];
                 NSString *phoneAux = [words componentsJoinedByString:@""];
                 
@@ -430,10 +361,11 @@
                     }
                 }
                 
-                //NSLog(@"Fullname: %@, Firstname: %@, Lastname: %@, Phonenumber: %@, Photo: %@, Origin: %@", friend.fullName, friend.firstName, friend.lastName, friend.phoneNumber, friend.photo, friend.origin);
-                
-                //NSLog(@"%@, %@, %@, %@, %@", friend.fullName, friend.firstName, friend.lastName, friend.phoneNumber, friend.photo, friend.photo);
                 if (![DataProvider findFriendByTelephone:phoneAux]) {
+                    
+                    NSArray* words = [celNumber componentsSeparatedByCharactersInSet :[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+                    celNumber = [words componentsJoinedByString:@""];
+                    
                     Friend *friend = [NSEntityDescription insertNewObjectForEntityForName:@"Friend" inManagedObjectContext:managedContext];
                     friend.fullName = (__bridge NSString * _Nullable)(fullName);
                     friend.firstName = (__bridge NSString * _Nullable)(firstName);
@@ -441,8 +373,11 @@
                     friend.origin = @"T";
                     friend.phoneNumber = celNumber;
                     
-                    friend.photo = [self devuelveDatosUsuarioAltruus:celNumber]; //comente 080717
-                    //friend.photo = @"";
+                
+                    cadenaTelefonos = [NSMutableString stringWithFormat:@"%@%@,", cadenaTelefonos, celNumber];
+                    
+                    //friend.photo = [self devuelveDatosUsuarioAltruus:celNumber]; //comente 080717
+                    friend.photo = @"";
                     friend.phoneWithoutLada = phoneAux;
                     
                     NSError *error;
@@ -457,49 +392,103 @@
                 
             }
         }
-        //NSLog(@"Contact List: %@", cList);
-        //NSLog(@"Contact List: %@", contactList);
-        //NSLog(@"Keys: %@", [contactList allKeys]);
-        //dispatch_semaphore_signal(semaphore);
-        
-        /*
-        NSArray *sortedKeys = [[contactList allKeys] sortedArrayUsingSelector: @selector(compare:)];
-        self.friendsKeys = [NSMutableArray arrayWithArray:sortedKeys];
-        self.friendList = contactList;
-        NSMutableArray *tempList = [@[] mutableCopy];
-        for (NSString *key in self.friendsKeys) {
-            Friends *friend = [Friends friendFromData:[self.friendList objectForKey:key]];
-            if (friend) {
-                [tempList addObject:friend];
-            }
-        }
-        */
         
         dispatch_async(dispatch_get_main_queue(), ^{
+            [self actualizaContactosAltruus:cadenaTelefonos];
             self.data = [self getFriendsFromTelephone:nil];
             self.friendCount = [NSNumber numberWithInteger:self.data.count];
             [self.tableview reloadData];
             [self.hud hide:YES];
         });
-         
         
     });
     //return contactList;
+    
+}
+
+
+-(void)actualizaContactosAltruus:(NSMutableString*)phones{
+    @try {
+        AppDelegate *delegate = [AppDelegate sharedAppDelegate];
+        NSManagedObjectContext *context = delegate.managedObjectContext;
+        self.localUser = [User getLocalUserSesion:context];
+        
+        NSArray* words = [phones componentsSeparatedByCharactersInSet :[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+        NSString* nospacestring = [words componentsJoinedByString:@""];
+        //NSLog(@"Phones: %@", nospacestring);
+        
+        NSString *urlString = [NSString stringWithFormat:@"%@?session=%@&phones=%@", VERIFY_CONTACT_PHONES_V3, self.localUser.session, nospacestring ];
+        NSURL *url = [NSURL URLWithString:urlString];
+        NSLog(@"URL: %@", url);
+        //NSLog(@"URL: %@", urlString);
+        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url
+                                                               cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData
+                                                           timeoutInterval:0.0];
+        NSURLResponse *response;
+        NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:nil];
+        NSDictionary *dictionary = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil]; //el json se guarda en este array
+        
+        NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
+        NSInteger codeService = [httpResponse statusCode];
+        if (codeService == 200) {
+            NSLog(@"Dictionary : %@", dictionary);
+            NSDictionary *dictStatus = [dictionary objectForKey:@"status"];
+            NSInteger code = [[dictStatus objectForKey:@"code"] integerValue];
+            if(code == 200){
+                NSArray *array = [dictionary objectForKey:@"users"];
+                NSInteger isUser = 0;
+                NSString *facebookId = @"";
+                for (NSDictionary *dict in array) {
+                    isUser = [[dict objectForKey:@"isUser"] integerValue];
+                    if ( isUser == 0 ) {
+                        //NSLog(@"No es usuario");
+                        //break;
+                    }else{
+                        //NSLog(@"Es usuariooooooooooooooooo;");
+                        facebookId = [dict objectForKey:@"facebookId"];
+                        facebookId = [NSString stringWithFormat:@"http://graph.facebook.com/%@/picture?type=normal",facebookId];
+                        NSLog(@"Usuario: %@", dict);
+                        AppDelegate *delegate = [AppDelegate sharedAppDelegate];
+                        NSManagedObjectContext *managedContext = delegate.managedObjectContext;
+                        
+                        NSString *predicateFormat = [[NSPredicate predicateWithFormat:@"origin = %@", @"T"] predicateFormat];
+                        predicateFormat = [predicateFormat stringByAppendingFormat:@" AND phoneNumber = %@ ", [dict objectForKey:@"phone"]];
+                        
+                        NSFetchRequest *request = [[NSFetchRequest alloc] init];
+                        request.entity = [NSEntityDescription entityForName:@"Friend" inManagedObjectContext:managedContext];
+                        request.predicate = [NSPredicate predicateWithFormat:predicateFormat];
+                        
+                        NSArray *records = [managedContext executeFetchRequest:request error:NULL];
+                        
+                        if ([records count] > 0) {
+                            Friend *friend = [records objectAtIndex:0];
+                            friend.photo = facebookId;
+                            NSError *error;
+                            if (![managedContext save:&error]) {
+                                NSLog(@"Error Para Guardar: %@", [error localizedDescription]);
+                            }
+                        }
+                    }
+                    //NSLog(@"Paso");
+                }
+            }
+        }
+                
+       
+    } @catch (NSException *exception) {
+        NSLog(@"Error: %@", exception);
+    }
 }
 
 -(NSString*)devuelveDatosUsuarioAltruus:(NSString*)phoneNumber{
-    //NSString *phoneAux = [phoneNumber stringByReplacingOccurrencesOfString:@" " withString:@""];
-    //phoneAux = [phoneAux stringByReplacingOccurrencesOfString:@"-" withString:@""];
+   
     
     NSArray* words = [phoneNumber componentsSeparatedByCharactersInSet :[NSCharacterSet whitespaceAndNewlineCharacterSet]];
     NSString *phoneAux = [words componentsJoinedByString:@""];
     
-    //NSLog(@"PhoneAux: %@, Longitud: %lu", phoneAux, (unsigned long)phoneAux.length);
     if ([phoneAux length] > 10) {
-        //phoneAux = [phoneAux substringWithRange:NSMakeRange([phoneAux length]-10-1, [phoneAux length]-1)];
-        //NSLog(@"phoneAux: %@", phoneAux);
+    
         @try {
-            //phoneAux = [phoneAux substringWithRange:NSMakeRange([phoneAux length]-11, [phoneAux length]-1)];
             phoneAux = [phoneAux substringFromIndex:[phoneAux length]-10];
             //NSLog(@"Quedó PhoneAux: %@, Longitud: %lu", phoneAux, (unsigned long)phoneAux.length);
         } @catch (NSException *exception) {
@@ -514,39 +503,30 @@
         NSManagedObjectContext *context = delegate.managedObjectContext;
         self.localUser = [User getLocalUserSesion:context];
         
-        NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
-        [dict setObject:self.localUser.tokenAltruus forKey:@"token"];
-        [dict setObject:self.localUser.userIDAltruus forKey:@"userId"];
-        [dict setObject:phoneAux forKey:@"phone"];
+        NSString *urlString = [NSString stringWithFormat:@"%@?session=%@&phone=%@", FIND_ALTRUUS_USER_V3, self.localUser.session, phoneAux ];
+        NSURL *url = [NSURL URLWithString:urlString];
+        NSLog(@"URL: %@", urlString);
+        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url
+                                                               cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData
+                                                           timeoutInterval:0.0];
+        NSURLResponse *response;
+        NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:nil];
+        NSDictionary *dictionary = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil]; //el json se guarda en este array
         
-        NSData *jsonData = [NSJSONSerialization dataWithJSONObject:dict options:0 error:nil];
-        NSString *jsonString;
-        if (!jsonData) {
-        } else {
-            jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-        }
-        
-        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:FIND_ALTRUUS_USER]];
-        request.HTTPMethod = @"POST";
-        [request setValue:@"application/json; charset=utf-8" forHTTPHeaderField:@"Content-Type"];
-        request.HTTPBody = jsonData;
-        
-        NSURLResponse *res = nil;
-        NSError *err = nil;
-        
-        NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&res error:&err];
-        NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)res;
-        
-        NSInteger code = [httpResponse statusCode];
-        NSDictionary *dictionary = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
-        NSLog(@"Teléfono: %@", phoneAux);
-        if (code == 200) {
-            //NSLog(@"Array: %@", array);
-            NSLog(@"Encontré %@ %@, %@", [dictionary objectForKey:@"firstName"], [dictionary objectForKey:@"lastName"], [dictionary objectForKey:@"facebookId"]);
-            NSLog(@"%@",[NSString stringWithFormat:@"http://graph.facebook.com/%@/picture?type=large",[dictionary objectForKey:@"facebookId"]]);
-            
-            return [NSString stringWithFormat:@"http://graph.facebook.com/%@/picture?type=large",[dictionary objectForKey:@"facebookId"]];
-            
+        NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
+        NSInteger codeService = [httpResponse statusCode];
+        if (codeService == 200) {
+            NSLog(@"Dictionary : %@", dictionary);
+            NSDictionary *dictStatus = [dictionary objectForKey:@"status"];
+            NSInteger code = [[dictStatus objectForKey:@"code"] integerValue];
+            if(code == 200){
+                dictionary = [dictionary objectForKey:@"entity"];
+                NSLog(@"Encontré %@ %@, %@", [dictionary objectForKey:@"firstName"], [dictionary objectForKey:@"lastName"], [dictionary objectForKey:@"facebookId"]);
+                NSLog(@"%@",[NSString stringWithFormat:@"http://graph.facebook.com/%@/picture?type=normal",[dictionary objectForKey:@"facebookId"]]);
+                
+                return [NSString stringWithFormat:@"http://graph.facebook.com/%@/picture?type=normal",[dictionary objectForKey:@"facebookId"]];
+                
+            }
         }
     } @catch (NSException *exception) {
         NSLog(@"Error: %@", exception);
@@ -554,6 +534,57 @@
     
     return @"";
 }
+    
+    
+-(NSString*)devuelveDatosUsuarioAltruus2:(NSString*)phoneNumber{
+    NSArray* words = [phoneNumber componentsSeparatedByCharactersInSet :[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    NSString *phoneAux = [words componentsJoinedByString:@""];
+    
+    if ([phoneAux length] > 10) {
+        @try {
+            phoneAux = [phoneAux substringFromIndex:[phoneAux length]-10];
+        } @catch (NSException *exception) {
+            NSLog(@"Error Al Recortar Teléfono: %@", exception);
+        } @finally {
+            
+        }
+    }
+    
+    @try {
+        AppDelegate *delegate = [AppDelegate sharedAppDelegate];
+        NSManagedObjectContext *context = delegate.managedObjectContext;
+        self.localUser = [User getLocalUserSesion:context];
+        
+       
+        NSString *urlString = [NSString stringWithFormat:@"%@?session=%@&phone=%@", FIND_ALTRUUS_USER_V3, self.localUser.session, phoneAux ];
+        NSURL *url = [NSURL URLWithString:urlString];
+        NSLog(@"URL: %@", urlString);
+        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url
+                                                               cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData
+                                                           timeoutInterval:0.0];
+        NSURLResponse *response;
+        NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:nil];
+        NSDictionary *dictionary = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil]; //el json se guarda en este array
+        
+        NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
+        NSInteger codeService = [httpResponse statusCode];
+        if (codeService == 200) {
+            NSLog(@"Dictionary : %@", dictionary);
+            NSDictionary *dictStatus = [dictionary objectForKey:@"status"];
+            NSInteger code = [[dictStatus objectForKey:@"code"] integerValue];
+            if(code == 200){
+                dictionary = [dictionary objectForKey:@"entity"];
+                return [NSString stringWithFormat:@"http://graph.facebook.com/%@/picture?type=normal",[dictionary objectForKey:@"facebookId"]];
+            }
+        }
+    } @catch (NSException *exception) {
+        NSLog(@"Error: %@", exception);
+    }
+    
+    return @"";
+}
+    
+    
 
 
 -(void)goBack{
@@ -590,6 +621,7 @@
 }
 
 -(IBAction)tappedSendGiftsToFriends:(UIButton*)sender{
+    NSLog(@"CategoryString: %@", self.categoryString);
     //Recuperar los ids de los usuarios
     if ([self.categoryString isEqualToString:@"Paid"]) {
         UIViewController *controller = [self.storyboard instantiateViewControllerWithIdentifier:@"chooseCard"];
@@ -604,41 +636,34 @@
                 if ([DataProvider networkConnected]) {
                     BOOL error = NO;
                     BOOL altruusUser = YES;
-                    for (Friends *friend in self.selectedList0) {
-                        //NSLog(@"Phone Number: %@, Token: %@, userID: %@, giftID: %@", friend.phoneNumber, self.localUser.tokenAltruus, self.localUser.userIDAltruus, [self.gift objectForKey:@"id"] );
+                    for (Friends *fr in self.selectedList0) {
+                        NSLog(@"Phone Number: %@, Token: %@, userID: %@, giftID: %@", fr.phoneNumber, self.localUser.tokenAltruus, self.localUser.userIDAltruus, [self.gift objectForKey:@"id"] );
                         
-                        NSMutableDictionary *dict = [[NSMutableDictionary alloc]init];
-                        [dict setObject:friend.phoneNumber forKey:@"friendPhone"];
-                        [dict setObject:[self.gift objectForKey:@"id"] forKey:@"giftId"];
-                        [dict setObject:self.localUser.tokenAltruus forKey:@"token"];
-                        [dict setObject:self.localUser.userIDAltruus forKey:@"userId"];
-                        //ELIMINAR
-                        //[dict setObject:@"kj4mopn72lbqts89k50p0k7ouu" forKey:@"token"];
-                        //[dict setObject:@"5" forKey:@"userId"];
+                        NSString *urlString = [NSString stringWithFormat:@"%@?session=%@&giftId=%@&phone=%@", SEND_FREE_GIFT_V3, self.localUser.session, [self.gift objectForKey:@"id"],fr.phoneNumber];
+                        NSURL *url = [NSURL URLWithString:urlString];
+                        NSLog(@"URL: %@", url);
+                        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url
+                                                                               cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData
+                                                                           timeoutInterval:0.0];
+                        NSURLResponse *response;
+                        NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:nil];
+                        NSDictionary *dictionary = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil]; //el json se guarda en este array
                         
-                        NSData *jsonData = [NSJSONSerialization dataWithJSONObject:dict options:0 error:nil];
-                        
-                        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:SEND_FREE_GIFT]];
-                        request.HTTPMethod = @"POST";
-                        [request setValue:@"application/json; charset=utf-8" forHTTPHeaderField:@"Content-Type"];
-                        request.HTTPBody = jsonData;
-                        
-                        NSURLResponse *res = nil;
-                        NSError *err = nil;
-                        
-                        //NSLog(@"Telefono: %@", friend.fullName);
-                        [NSURLConnection sendSynchronousRequest:request returningResponse:&res error:&err];
-                        NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)res;
-                        
-                        NSInteger code = [httpResponse statusCode];
-                        NSLog(@"Code: %ld, Response: %@", (long)code, httpResponse);
-                        if (code != 200) {
-                            error = YES;
+                        NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
+                        NSInteger codeService = [httpResponse statusCode];
+                        if (codeService == 200) {
+                            NSLog(@"Dictionary : %@", dictionary);
+                            NSInteger code = [[dictionary objectForKey:@"code"] integerValue];
+                            if (code != 200) {
+                                error = YES;
+                            }
+                            
+                            if (![self esUsuarioAltruus:fr.phoneNumber]) {
+                                altruusUser = NO;
+                            }
                         }
                         
-                        if (![self esUsuarioAltruus:friend.phoneNumber]) {
-                            altruusUser = NO;
-                        }
+                        
                         
                     }//Fin for
                     
@@ -651,24 +676,25 @@
                                               otherButtonTitles:nil];
                         [alert show];
                     }else{
-                        [[MZFormSheetBackgroundWindow appearance] setBackgroundBlurEffect:YES];
-                        [[MZFormSheetBackgroundWindow appearance] setBlurRadius:5.0];
-                        [[MZFormSheetBackgroundWindow appearance] setBackgroundColor:[UIColor altruus_duckEggBlueColor]];
-                        
-                        UIViewController *controller = [self.storyboard instantiateViewControllerWithIdentifier:kV2StoryboardRedeem];
-                        if ([controller isKindOfClass:[RedeemGiftViewController class]]) {
-                            ((RedeemGiftViewController*) controller).screenType = RedeemScreenTypeSentGift;
-                        }
-                        
-                        MZFormSheetController *formSheet = [[MZFormSheetController alloc] initWithViewController:controller];
-                        formSheet.transitionStyle = MZFormSheetTransitionStyleSlideFromTop;
-                        formSheet.presentedFormSheetSize = CGSizeMake(300, 460);
-                        
-                        formSheet.formSheetWindow.transparentTouchEnabled = YES;
-                        [formSheet presentAnimated:YES completionHandler:^(UIViewController *presentedFSViewController) {
-                            //do something
-                        }];
-                        if (!altruusUser) {
+                        if(altruusUser){
+                            [[MZFormSheetBackgroundWindow appearance] setBackgroundBlurEffect:YES];
+                            [[MZFormSheetBackgroundWindow appearance] setBlurRadius:5.0];
+                            [[MZFormSheetBackgroundWindow appearance] setBackgroundColor:[UIColor altruus_duckEggBlueColor]];
+                            
+                            UIViewController *controller = [self.storyboard instantiateViewControllerWithIdentifier:kV2StoryboardRedeem];
+                            if ([controller isKindOfClass:[RedeemGiftViewController class]]) {
+                                ((RedeemGiftViewController*) controller).screenType = RedeemScreenTypeSentGift;
+                            }
+                            
+                            MZFormSheetController *formSheet = [[MZFormSheetController alloc] initWithViewController:controller];
+                            formSheet.transitionStyle = MZFormSheetTransitionStyleSlideFromTop;
+                            formSheet.presentedFormSheetSize = CGSizeMake(300, 460);
+                            
+                            formSheet.formSheetWindow.transparentTouchEnabled = YES;
+                            [formSheet presentAnimated:YES completionHandler:^(UIViewController *presentedFSViewController) {
+                                //do something
+                            }];
+                        }else{
                             UIAlertView *alert = [[UIAlertView alloc]initWithTitle:@"Not an Altrüus user!"
                                                                            message:@"Your friend doesn't have Altrüus yet. Let them know so they can redeem their thoughtful gift!"
                                                                           delegate:self
@@ -678,7 +704,6 @@
                             alert.tag=101;//add tag to alert
                             [alert show];
                         }
-                        
                     }
                     
                 }else{
@@ -709,7 +734,8 @@
 -(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex{
     if (alertView.tag == 101) {
         if (buttonIndex == 1) {
-            NSString *inviteText = [NSString stringWithFormat:@"I just sent you a gift! Download Altrüus from the following link to redeem:"];
+            //NSString *inviteText = [NSString stringWithFormat:@"I just sent you a gift! Download Altrüus from the following link to redeem:"];
+            NSString *inviteText = NSLocalizedString(@"I just sent you a gift! Download Altrüus from the following link to redeem:", nil);
             NSDictionary *params;
             if (self.localUser){
                 params = @{@"userID":self.localUser.userID,
@@ -723,6 +749,26 @@
                                                                                      stage:@"pre_invite"];
             UIActivityViewController *activityVC = [[UIActivityViewController alloc] initWithActivityItems:@[inviteText,itemProvider] applicationActivities:nil];
             activityVC.excludedActivityTypes = @[UIActivityTypePrint,UIActivityTypeCopyToPasteboard,UIActivityTypeSaveToCameraRoll,UIActivityTypeAddToReadingList,UIActivityTypePostToTwitter,UIActivityTypeAirDrop,@"com.tumblr.tumblr.Share-With-Tumblr",@"com.apple.mobilenotes.SharingExtension",@"com.apple.reminders.RemindersEditorExtension"];
+            [activityVC setCompletionWithItemsHandler:^(UIActivityType  _Nullable activityType, BOOL completed, NSArray * _Nullable returnedItems, NSError * _Nullable activityError) {
+                [[MZFormSheetBackgroundWindow appearance] setBackgroundBlurEffect:YES];
+                [[MZFormSheetBackgroundWindow appearance] setBlurRadius:5.0];
+                [[MZFormSheetBackgroundWindow appearance] setBackgroundColor:[UIColor altruus_duckEggBlueColor]];
+                
+                UIViewController *controller = [self.storyboard instantiateViewControllerWithIdentifier:kV2StoryboardRedeem];
+                if ([controller isKindOfClass:[RedeemGiftViewController class]]) {
+                    ((RedeemGiftViewController*) controller).screenType = RedeemScreenTypeSentGift;
+                }
+                
+                MZFormSheetController *formSheet = [[MZFormSheetController alloc] initWithViewController:controller];
+                formSheet.transitionStyle = MZFormSheetTransitionStyleSlideFromTop;
+                formSheet.presentedFormSheetSize = CGSizeMake(300, 460);
+                
+                formSheet.formSheetWindow.transparentTouchEnabled = YES;
+                [formSheet presentAnimated:YES completionHandler:^(UIViewController *presentedFSViewController) {
+                    //do something
+                }];
+            }];
+            
             [self presentViewController:activityVC animated:YES completion:nil];
         }
     }
@@ -731,6 +777,7 @@
 -(BOOL)esUsuarioAltruus:(NSString*)phoneNumber{
     NSArray* words = [phoneNumber componentsSeparatedByCharactersInSet :[NSCharacterSet whitespaceAndNewlineCharacterSet]];
     NSString *phoneAux = [words componentsJoinedByString:@""];
+    phoneAux = [phoneAux stringByReplacingOccurrencesOfString:@"-" withString:@""];
     
     if ([phoneAux length] > 10) {
         @try {
@@ -747,39 +794,28 @@
         NSManagedObjectContext *context = delegate.managedObjectContext;
         self.localUser = [User getLocalUserSesion:context];
         
-        NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
-        [dict setObject:self.localUser.tokenAltruus forKey:@"token"];
-        [dict setObject:self.localUser.userIDAltruus forKey:@"userId"];
-        [dict setObject:phoneAux forKey:@"phone"];
+        NSString *urlString = [NSString stringWithFormat:@"%@?session=%@&phone=%@", FIND_ALTRUUS_USER_V3, self.localUser.session, phoneAux ];
+        NSURL *url = [NSURL URLWithString:urlString];
+        NSLog(@"URL: %@", urlString);
+        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url
+                                                               cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData
+                                                           timeoutInterval:0.0];
+        NSURLResponse *response;
+        NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:nil];
+        NSDictionary *dictionary = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil]; //el json se guarda en este array
         
-        NSData *jsonData = [NSJSONSerialization dataWithJSONObject:dict options:0 error:nil];
-        NSString *jsonString;
-        if (!jsonData) {
-        } else {
-            jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+        NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
+        NSInteger codeService = [httpResponse statusCode];
+        if (codeService == 200) {
+            NSLog(@"Dictionary : %@", dictionary);
+            NSDictionary *dictStatus = [dictionary objectForKey:@"status"];
+            NSInteger code = [[dictStatus objectForKey:@"code"] integerValue];
+            if(code == 200){
+                return YES;
+            }else{
+                return NO;
+            }
         }
-        
-        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:FIND_ALTRUUS_USER]];
-        request.HTTPMethod = @"POST";
-        [request setValue:@"application/json; charset=utf-8" forHTTPHeaderField:@"Content-Type"];
-        request.HTTPBody = jsonData;
-        
-        NSURLResponse *res = nil;
-        NSError *err = nil;
-        
-        [NSURLConnection sendSynchronousRequest:request returningResponse:&res error:&err];
-        NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)res;
-        
-        NSInteger code = [httpResponse statusCode];
-        //NSDictionary *dictionary = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
-        
-        
-        if (code == 200) {
-            return YES;
-        }else{
-            return NO;
-        }
-        
     } @catch (NSException *exception) {
         NSLog(@"Error: %@", exception);
     }
@@ -794,33 +830,27 @@
             NSManagedObjectContext *context = delegate.managedObjectContext;
             self.localUser = [User getLocalUserSesion:context];
             
-            NSMutableDictionary *dict = [[NSMutableDictionary alloc]init];
-            [dict setObject:self.localUser.tokenAltruus forKey:@"token"];
-            [dict setObject:self.localUser.userIDAltruus forKey:@"userId"];
+            NSString *urlString = [NSString stringWithFormat:@"%@?session=%@", RETRIEVE_TOTAL_USERS_V3, self.localUser.session ];
+            NSURL *url = [NSURL URLWithString:urlString];
+            NSLog(@"URL: %@", urlString);
+            NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url
+                                                                   cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData
+                                                               timeoutInterval:0.0];
+            NSURLResponse *response;
+            NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:nil];
+            NSDictionary *dictionary = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil]; //el json se guarda en este array
             
-            
-            NSData *jsonData = [NSJSONSerialization dataWithJSONObject:dict options:0 error:nil];
-            
-            NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:RETRIEVE_TOTAL_USERS]];
-            request.HTTPMethod = @"POST";
-            [request setValue:@"application/json; charset=utf-8" forHTTPHeaderField:@"Content-Type"];
-            request.HTTPBody = jsonData;
-            
-            NSURLResponse *res = nil;
-            NSError *err = nil;
-            
-            NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&res error:&err];
-            NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)res;
-            NSDictionary *dictionary = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
-            
-            NSInteger code = [httpResponse statusCode];
-            //NSLog(@"Code: %ld, Response: %@", (long)code, array);
-            if (code == 200) {
-                return [[dictionary objectForKey:@"count"] integerValue];
-                //NSLog(@"Total: %@", [array objectForKey:@"count"]);
-                //NSDictionary *dictionary = [array objectAtIndex:0];
-                //NSLog(@"Total %@", [dictionary objectForKey:@"count"]);
+            NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
+            NSInteger codeService = [httpResponse statusCode];
+            if (codeService == 200) {
+                NSLog(@"Dictionary : %@", dictionary);
+                NSDictionary *dictStatus = [dictionary objectForKey:@"status"];
+                NSInteger code = [[dictStatus objectForKey:@"code"] integerValue];
+                if(code == 200){
+                    return [[dictionary objectForKey:@"count"] integerValue];
+                }
             }
+           
         }else{
             UIAlertView *alert = [[UIAlertView alloc]
                                   initWithTitle:nil
@@ -987,24 +1017,7 @@
         }else{
             cell.accessoryView = imgView;
         }
-        /*
-        if (indexPath.section == 0) {
-            //Primeros tres
-            NSNumber *row = @(indexPath.row);
-            if (![self.selectedList0 containsObject:row]) {
-                cell.accessoryView = imgView;
-            }else{
-                cell.accessoryView = nil;
-            }
-        }else if(indexPath.section == 1){
-            //El resto
-            NSNumber *row = @(indexPath.row);
-            if (![self.selectedList1 containsObject:row]) {
-                cell.accessoryView = imgView;
-            }else{
-                cell.accessoryView = nil;
-            }
-        }*/
+        
     }else{
         cell.accessoryView = nil;
         cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator; 
@@ -1158,11 +1171,7 @@
         
     }
     [searchBar resignFirstResponder];
-    //Lista de ids de usuarios
     
-    //self.selectedList0 = [@[] mutableCopy];
-    //self.selectedList1 = [@[] mutableCopy];
-    //[self contractSendGiftButton];
 }
 
 -(void)searchBar:(UISearchBar *)searchBar textDidChange:(NSString *)searchText{
@@ -1175,11 +1184,7 @@
         self.friendCount = [NSNumber numberWithInteger:self.data.count];
         [self.tableview reloadData];
     }
-    //Lista de ids de usuarios
-    
-    //self.selectedList0 = [@[] mutableCopy];
-    //self.selectedList1 = [@[] mutableCopy];
-    //[self contractSendGiftButton];
+ 
 }
 
 - (void)searchBarSearchButtonClicked:(UISearchBar *)searchBar{

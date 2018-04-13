@@ -11,6 +11,7 @@
 #import <UIImageView+WebCache.h>
 #import <FontAwesomeKit/FAKIonIcons.h>
 #import "GiftsViewController.h"
+#import "Servicios.h"
 
 
 @interface OrganizationProfileViewController ()
@@ -28,6 +29,7 @@
 @property (weak, nonatomic) IBOutlet UILabel *profileDescriptionLabel;
 @property (weak, nonatomic) IBOutlet UILabel *popularGiftsLabel;
 @property (weak, nonatomic) IBOutlet UILabel *bottomLabel;
+
 
 // Autolayout constants
 
@@ -59,6 +61,7 @@
 {
     
     NSLog(@"Viene de amigos: %@, Friend: %@", self.vieneDeAmigos ? @"YES" : @"NO", self.friend);
+    NSLog(@"Organization: %@", self.organization);
     
     FAKIonIcons *backIcon = [FAKIonIcons arrowLeftCIconWithSize:35];
     [backIcon addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithHexString:kColorGreen]];
@@ -70,9 +73,10 @@
         self.navigationItem.title = self.organizationName;
     }
     else{
-        self.navigationItem.title = NSLocalizedString(@"Organizations", nil);
+        self.navigationItem.title = NSLocalizedString(@"Businesses", nil);
     }
     
+    self.navigationItem.title = NSLocalizedString(@"Profile", nil);
     
     self.backContainerView.layer.cornerRadius = 10;
     self.backContainerView.layer.shadowColor = [[UIColor altruus_darkSkyBlue10Color] CGColor];
@@ -113,10 +117,13 @@
         if ([view isKindOfClass:[UIImageView class]]){
             //((UIImageView *)view).image = [UIImage imageNamed:@"pepsi"];
             if (self.organization) {
-                ((UIImageView *)view).image = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:[self.organization objectForKey:@"image"]]]];
+                ((UIImageView *)view).image = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@%@", PREFIJO_PHOTO_DETALLE,[self.organization objectForKey:@"image"]]]]];
                 self.profileNameLabel.text = [self.organization objectForKey:@"name"];
-                self.profileLocationLabel.text = [NSString stringWithFormat:@"Distance %@", [self.organization objectForKey:@"distance"]];
+                NSString *aux = NSLocalizedString(@"Distance", nil);
                 
+                self.profileLocationLabel.text = [NSString stringWithFormat:@"%@ %@",aux, [self.organization objectForKey:@"distance"]];
+                
+                NSLog(@"URL: %@", [NSString stringWithFormat:@"%@%@", PREFIJO_PHOTO_DETALLE,[self.organization objectForKey:@"image"]]);
             }
             
             
@@ -171,9 +178,10 @@
         ((GiftsViewController *)controller).showBackButton = YES;
         ((GiftsViewController *)controller).gifterName = [self.organization objectForKey:@"name"];
         ((GiftsViewController *)controller).dontShowSearch = YES;
-        ((GiftsViewController *)controller).organizationID = [[self.organization objectForKey:@"id"] integerValue];
+        ((GiftsViewController *)controller).organizationID = [self.organization objectForKey:@"id"];
         ((GiftsViewController *)controller).vieneDeAmigos = self.vieneDeAmigos;
         ((GiftsViewController *)controller).friend = self.friend;
+        ((GiftsViewController *)controller).vieneDeRegalosGratis = 2;
     }
     
     UINavigationController *base = [[UINavigationController alloc] initWithRootViewController:controller];

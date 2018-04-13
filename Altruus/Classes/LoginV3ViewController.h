@@ -19,7 +19,6 @@
 
 @interface LoginV3ViewController : UIViewController
 
-//@property (nonatomic, strong) IBOutlet FBSDKLoginButton *loginButton;
 @property (nonatomic, weak)id<LoginDelegateV3>delegate;
 @property (nonatomic) DownPicker *pickerCountry;
 

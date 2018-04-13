@@ -41,11 +41,7 @@
 }
 
 -(void)setup{
-    
-    //NSData *data = [NSData dataWithContentsOfURL : [NSURL URLWithString:[self.gift objectForKey:@"image"]]];
-    //UIImage *image = [UIImage imageWithData: data];
-    //self.imageView.image = image;
-    self.codeLabel.text = [NSString stringWithFormat:@"%@", [self.gift objectForKey:@"giftCode"]];
+    self.codeLabel.text = [NSString stringWithFormat:@"%@", [self.gift objectForKey:@"redeemCode"]];
     self.titleLabel.text = [self.gift objectForKey:@"giftName"];
     //self.dateLabel.text = [self.gift objectForKey:@"date"];
     self.dateLabel.lineBreakMode = NSLineBreakByWordWrapping;
@@ -54,37 +50,15 @@
     NSString *dateAux = [self.gift objectForKey:@"date"];
     NSArray *arrayAux = [dateAux componentsSeparatedByString:@" "];
     NSString *date, *hour;
+    
     @try {
-        date = [arrayAux objectAtIndex:0];
-        hour = [arrayAux objectAtIndex:1];
+        date = [NSString stringWithFormat:@"%@ %@ %@", [arrayAux objectAtIndex:0],[arrayAux objectAtIndex:1],[arrayAux objectAtIndex:2]];
+        hour = [NSString stringWithFormat:@"%@", [arrayAux objectAtIndex:3]];
     } @catch (NSException *exception) {
         
     }
+    self.dateLabel.text = [NSString stringWithFormat:@"%@\n%@",date,hour];
     
-    NSArray *dateSeparate = [date componentsSeparatedByString:@"/"];
-    NSString *fechaFinal;
-    
-    NSDateFormatter *dateFormat = [[NSDateFormatter alloc] init];
-    [dateFormat setLocale:[NSLocale currentLocale]];
-    NSArray *months = [dateFormat monthSymbols];
-    NSInteger mes = [[dateSeparate objectAtIndex:1] integerValue];
-    NSInteger dia = [[dateSeparate objectAtIndex:0] integerValue];
-    
-    /*
-    NSLocale *currentLocale = [NSLocale currentLocale];  // get the current locale.
-    NSString *countryCode = [currentLocale objectForKey:NSLocaleCountryCode];
-    if ([countryCode isEqualToString:@"MX"]) {
-        fechaFinal = [NSString stringWithFormat:@"%@ %@ %@", [[months objectAtIndex:mes-1] capitalizedString], [dateSeparate objectAtIndex:0], [dateSeparate objectAtIndex:2]];
-    }else{
-        fechaFinal = [NSString stringWithFormat:@"%@ %@th %@", [[months objectAtIndex:mes-1] capitalizedString], [dateSeparate objectAtIndex:0], [dateSeparate objectAtIndex:2]];
-    }*/
-    fechaFinal = [NSString stringWithFormat:@"%@ %ld %@", [[months objectAtIndex:mes-1] capitalizedString], (long)dia, [dateSeparate objectAtIndex:2]];
-    //NSLog(@"Fecha: %@", fechaFinal);
-    
-    
-    self.dateLabel.text = [NSString stringWithFormat:@"%@\n%@",fechaFinal,hour];
-    
-    //self.codeLabel.text = [self.gift objectForKey:@"giftCode"];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -97,13 +71,6 @@
     [self dismissViewControllerAnimated:YES completion:nil];
     [self.delegate cierraPantallaRedeem];
     
-    /*
-    [self mz_dismissFormSheetControllerAnimated:YES completionHandler:^(MZFormSheetController *formSheetController) {
-        // do something
-        [[NSNotificationCenter defaultCenter] postNotificationName:kV2NotificationRedeemDone object:nil];
-        
-    }];
-     */
 }
 
 

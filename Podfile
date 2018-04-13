@@ -27,6 +27,10 @@ pod 'PSTAlertController'
 pod 'OneSignal', '~> 2.0'
 pod 'Stripe' 
 pod 'NSStringMask'
+pod 'FBSDKCoreKit'
+pod 'FBSDKLoginKit'
+pod 'FBSDKShareKit'
+pod 'SBJson', '~> 4.0.0'
 end
 
 target 'AltruusTests' do

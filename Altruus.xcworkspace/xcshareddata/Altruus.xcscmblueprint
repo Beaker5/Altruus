@@ -1,0 +1,30 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "39DAFF2A6A59102163F6EB2B9A55E23F80D59B57",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "F93F881C9DEFD3D3185E996CE333581B70B7EAC3" : 0,
+    "39DAFF2A6A59102163F6EB2B9A55E23F80D59B57" : 0
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "7885E102-3ED2-42BC-8B92-C13C626D32A7",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "F93F881C9DEFD3D3185E996CE333581B70B7EAC3" : "Altruus",
+    "39DAFF2A6A59102163F6EB2B9A55E23F80D59B57" : "altruus-abundance-ios-2\/"
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "Altruus",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "Altruus.xcworkspace",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/Beaker5\/Altruus.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "39DAFF2A6A59102163F6EB2B9A55E23F80D59B57"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/fahzee1\/Altruus.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "F93F881C9DEFD3D3185E996CE333581B70B7EAC3"
+    }
+  ]
+}

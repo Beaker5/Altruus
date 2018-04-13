@@ -14,5 +14,6 @@
 @property (weak, nonatomic) IBOutlet UIImageView *redeemImageview;
 @property (weak, nonatomic) IBOutlet UILabel *mainLabel;
 @property (weak, nonatomic) IBOutlet UILabel *subLabel;
+@property (weak, nonatomic) IBOutlet UILabel *redeemLabel;
 
 @end

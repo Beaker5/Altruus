@@ -11,15 +11,29 @@
 #import "Servicios.h"
 #import "UpdatesTableViewCell.h"
 #import "DataProvider.h"
+#import <MBProgressHUD.h>
+#import "LoadingTableViewCell.h"
+#import "GiftsReceivedTableViewCell.h"
+
 
 @interface ReceivedDeliveredViewController ()<UITableViewDataSource,UITableViewDelegate>
 
 @property (weak, nonatomic) IBOutlet UISegmentedControl *segmentedControl;
-@property (weak, nonatomic) IBOutlet UITableView *tableview;
+@property (weak, nonatomic) IBOutlet UITableView *tableView;
 
 // Autolayout constraints
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *segmentControlHeight;
 
+@property (strong, nonatomic) NSMutableArray *updateData;
+@property (strong, nonatomic) MBProgressHUD *hud;
+
+@property (assign) NSInteger batchSize;
+@property (assign) NSInteger pageResults;
+@property (assign) NSInteger actualResult;
+@property (assign) NSInteger sizeResults;
+@property (assign) NSInteger totalResultsFound;
+@property (assign) NSInteger currentPage;
+@property (assign) NSInteger sizePerPage;
 
 @end
 
@@ -28,35 +42,11 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    @try {
-        if ([DataProvider networkConnected]) {
-            [self fetchData];
-        }else{
-            UIAlertView *alert = [[UIAlertView alloc]
-                                  initWithTitle:nil
-                                  message:@"No Network Connection!"
-                                  delegate:nil
-                                  cancelButtonTitle:NSLocalizedString(@"OK", nil)
-                                  otherButtonTitles:nil];
-            [alert show];
-        }
-    } @catch (NSException *exception) {
-        UIAlertView *alert = [[UIAlertView alloc]
-                              initWithTitle:@"App Error"
-                              message:exception.reason
-                              delegate:nil
-                              cancelButtonTitle:NSLocalizedString(@"OK", nil)
-                              otherButtonTitles:nil];
-        [alert show];
-    }
-    
-    
-    
     [self setup];
     
-    self.tableview.delegate = self;
-    self.tableview.dataSource = self;
-    self.tableview.contentInset = UIEdgeInsetsMake(0, 0, 50, 0);
+    self.tableView.delegate = self;
+    self.tableView.dataSource = self;
+    self.tableView.contentInset = UIEdgeInsetsMake(0, 0, 50, 0);
 }
 
 -(void)setup{
@@ -68,96 +58,257 @@
         self.navigationItem.title = NSLocalizedString(@"Received", nil);
     }
     
-    self.tableview.backgroundColor = [UIColor altruus_duckEggBlueColor];
+    self.tableView.backgroundColor = [UIColor altruus_duckEggBlueColor];
     self.view.backgroundColor = [UIColor altruus_duckEggBlueColor];
-    self.tableview.layer.cornerRadius = 5;
+    self.tableView.layer.cornerRadius = 5;
+    
+    _currentPage = 1;
+    _sizePerPage = 8;
+}
+
+-(void)viewWillAppear:(BOOL)animated{
+    [super viewWillAppear:animated];
+    
+    [self fetchData];
+    [self.tableView reloadData];
 }
 
 -(void)fetchData{
-    NSLog(@"Local User: %@", self.localUser);
+    self.updateData = nil;
+    [self.tableView reloadData];
+    
+    //Mostrar ícono de descarga
+    self.hud = [MBProgressHUD showHUDAddedTo:self.tableView animated:YES];
+    self.hud.mode = MBProgressHUDModeIndeterminate;
+    self.hud.labelText = NSLocalizedString(@"Grabbing Gifts", nil);
+    
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self.updateData = [self returnUpdatesData];
+        
+        [self.hud hide:YES];
+        [self.tableView reloadData];
+    });
+}
+
+
+-(void)fetchMoreData{
+    NSMutableArray *indexPaths = [NSMutableArray array];
+    NSArray *data =  [self returnUpdatesData];
+    
+    for (NSObject *object in data) {
+        [self.updateData addObject:object];
+        [indexPaths addObject:[NSIndexPath indexPathForRow:self.updateData.count - 1 inSection:0]];
+    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.tableView beginUpdates];
+        [self.tableView insertRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationTop];
+        [self.tableView endUpdates];
+    });
+    //[self.hud hide:YES];
+    
+}
+
+-(NSMutableArray*)returnUpdatesData{
+    NSMutableArray *arrayAux = [NSMutableArray new];
     
     self.data = [NSArray new];
-    NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
-    [dict setObject:self.localUser.tokenAltruus forKey:@"token"];
-    [dict setObject:self.localUser.userIDAltruus forKey:@"userId"];
+    NSString *aux = @"";
     
-    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:dict options:0 error:nil];
-    NSString *jsonString;
-    if (!jsonData) {
-    } else {
-        jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+    if([self.screenType isEqualToString:@"S"]){
+        aux = [NSString stringWithFormat:@"sent"];
+    }else{
+        if([self.screenType isEqualToString:@"R"]){
+            aux = [NSString stringWithFormat:@"received"];
+        }
     }
     
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:UPDATES_USER]];
-    request.HTTPMethod = @"POST";
-    [request setValue:@"application/json; charset=utf-8" forHTTPHeaderField:@"Content-Type"];
-    request.HTTPBody = jsonData;
+    NSString *urlString = [NSString stringWithFormat:@"%@?session=%@&page=%ld&size=%ld&type=%@&sort=DATE_DESC", UPDATES_USER_V3, self.localUser.session, _currentPage, _sizePerPage, aux ];
+    NSURL *url = [NSURL URLWithString:urlString];
+    NSLog(@"URL: %@", urlString);
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url
+                                                           cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData
+                                                       timeoutInterval:0.0];
+    NSURLResponse *response;
+    NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:nil];
+    NSDictionary *dictionary = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil]; //el json se guarda en este array
     
-    NSURLResponse *res = nil;
-    NSError *err = nil;
-    
-    NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&res error:&err];
-    NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)res;
-    
-    NSInteger code = [httpResponse statusCode];
-    NSArray *array = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
-    NSLog(@"-----------------------------------------------------------------------------------");
-    NSLog(@"Codigo: %ld, Diccionario Updates: %@", (long)code, array);
-    NSLog(@"-----------------------------------------------------------------------------------");
-    if (code == 200) {
-        NSMutableArray *arrayAux = [NSMutableArray new];
-        NSDictionary *dict;
-        NSString *giftName, *merchantName, *userFrom, *userTo, *picture, *pictureType, *datetime;
-        for (NSDictionary *dictionary in array) {
-            giftName = [dictionary objectForKey:@"giftName"];
-            merchantName = [dictionary objectForKey:@"merchantName"];
-            userFrom = [dictionary objectForKey:@"userFrom"];
-            userTo = [dictionary objectForKey:@"userTo"];
-            picture = [dictionary objectForKey:@"picture"];
-            pictureType = [dictionary objectForKey:@"pictureType"];
-            datetime = [dictionary objectForKey:@"datetime"];
+    NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
+    NSInteger codeService = [httpResponse statusCode];
+    if (codeService == 200) {
+        NSLog(@"Dictionary : %@", dictionary);
+        NSDictionary *dictStatus = [dictionary objectForKey:@"status"];
+        NSInteger code = [[dictStatus objectForKey:@"code"] integerValue];
+        if(code == 200){
+            NSArray *array = [dictionary objectForKey:@"updates"];
             
-            /*
-            double getDate = 14211;
-            NSTimeInterval seconds = getDate / 1000;
-            NSDate *date = [NSDate dateWithTimeIntervalSince1970:seconds];
-            NSLog(@"Date: %@", date);
-            */
+            NSDictionary *dict;
+            NSString *giftName, *merchantName, *userFrom, *userTo, *picture, *pictureType, *sentOrReceived, *senderPicture, *receiverPicture, *redeemDate, *date, *isRedeemed;
             
-            if ([userTo isEqualToString:@"you"] && [self.screenType isEqualToString:@"R"]) {
-                //Regalos recibidos
+            
+            _batchSize = [[dictionary objectForKey:@"batchSize"] integerValue];
+            _pageResults = [[dictionary objectForKey:@"page"] integerValue];
+            _sizeResults = [[dictionary objectForKey:@"size"] integerValue];
+            _totalResultsFound = [[dictionary objectForKey:@"totalResultsFound"] integerValue];
+            _actualResult = _actualResult + [array count];
+            
+            for (NSDictionary *dict2 in array) {
+                
+                giftName = [dict2 objectForKey:@"giftName"];
+                merchantName = [dict2 objectForKey:@"merchantName"];
+                userFrom = [dict2 objectForKey:@"senderName"]; //De quien es
+                userTo = [dict2 objectForKey:@"receiverName"]; //A quien se lo envio
+                picture = [dict2 objectForKey:@"receiverPicture"];
+                //pictureType = [dict2 objectForKey:@"pictureType"];
+                date = [dict2 objectForKey:@"createdAt"];
+                redeemDate = [dict2 objectForKey:@"redeemAt"];
+                pictureType = @"NAME";
+                sentOrReceived = [dict2 objectForKey:@"sentOrReceived"];
+                senderPicture = [dict2 objectForKey:@"senderPicture"];
+                receiverPicture = [dict2 objectForKey:@"receiverPicture"];
+                isRedeemed =  [NSString stringWithFormat:@"%@", [dict2 objectForKey:@"isRedeemed"]];
+                
+                
+                //FEcha 1
+                NSString *datetime = date;
                 double getDate = [datetime doubleValue];
                 NSTimeInterval seconds = getDate / 1000;
                 NSDate *date = [NSDate dateWithTimeIntervalSince1970:seconds];
                 NSDateFormatter *dateFormat = [[NSDateFormatter alloc] init];
                 [dateFormat setDateFormat:@"dd/MM/yyyy hh:mma"];
                 NSString *dateString = [dateFormat stringFromDate:date];
-                //NSLog(@"date: %@", dateString);
                 
+                NSArray *array = [dateString componentsSeparatedByString:@" "];
+                NSString *dateOriginal, *hourOriginal;
+                @try {
+                    dateOriginal = [array objectAtIndex:0];
+                    hourOriginal = [array objectAtIndex:1];
+                } @catch (NSException *exception) {
+                    
+                }
                 
-                dict = @{@"title": [NSString stringWithFormat:@"%@ sent you %@ from %@", userFrom, giftName, merchantName],
-                         @"date":dateString,
-                         @"type":pictureType,
-                         @"image":picture};
-                [arrayAux addObject:dict];
-            }else if ([userFrom isEqualToString:@"you"] && [self.screenType isEqualToString:@"S"]) {
-                //Regalos enviados
-                double getDate = [datetime doubleValue];
-                NSTimeInterval seconds = getDate / 1000;
-                NSDate *date = [NSDate dateWithTimeIntervalSince1970:seconds];
-                NSDateFormatter *dateFormat = [[NSDateFormatter alloc] init];
-                [dateFormat setDateFormat:@"dd/MM/yyyy hh:mma"];
-                NSString *dateString = [dateFormat stringFromDate:date];
-                //NSLog(@"date: %@", dateString);
+                NSArray *dateSeparate = [dateOriginal componentsSeparatedByString:@"/"];
+                NSString *fechaFinal, *fechaFinalRedeem;
                 
-                dict = @{@"title": [NSString stringWithFormat:@"You sent %@ to %@ from %@", giftName, userTo, merchantName],
-                         @"date": dateString,
-                         @"type":pictureType,
-                         @"image":picture};
+                NSDateFormatter *df = [[NSDateFormatter alloc] init];
+                [df setLocale:[NSLocale currentLocale]];
+                NSArray *months = [df monthSymbols];
+                NSInteger mes = [[dateSeparate objectAtIndex:1] integerValue];
+                NSInteger dia = [[dateSeparate objectAtIndex:0] integerValue];
+                
+                fechaFinal = [NSString stringWithFormat:@"%@ %ld %@ %@m.", [[months objectAtIndex:mes-1] capitalizedString], (long)dia, [dateSeparate objectAtIndex:2], hourOriginal];
+                
+                if([redeemDate isEqualToString:@""]){
+                    fechaFinalRedeem = @"";
+                }else{
+                    //Fecha 2
+                    datetime = redeemDate;
+                    getDate = [datetime doubleValue];
+                    seconds = getDate / 1000;
+                    date = [NSDate dateWithTimeIntervalSince1970:seconds];
+                    dateFormat = [[NSDateFormatter alloc] init];
+                    [dateFormat setDateFormat:@"dd/MM/yyyy hh:mma"];
+                    dateString = [dateFormat stringFromDate:date];
+                    
+                    array = [dateString componentsSeparatedByString:@" "];
+                    @try {
+                        dateOriginal = [array objectAtIndex:0];
+                        hourOriginal = [array objectAtIndex:1];
+                    } @catch (NSException *exception) {
+                        
+                    }
+                    
+                    dateSeparate = [dateOriginal componentsSeparatedByString:@"/"];
+                    
+                    
+                    months = [df monthSymbols];
+                    mes = [[dateSeparate objectAtIndex:1] integerValue];
+                    dia = [[dateSeparate objectAtIndex:0] integerValue];
+                    
+                    fechaFinalRedeem = [NSString stringWithFormat:@"%@ %ld %@ %@m.", [[months objectAtIndex:mes-1] capitalizedString], (long)dia, [dateSeparate objectAtIndex:2], hourOriginal];
+                }
+                
+                if([self.screenType isEqualToString:@"S"]){
+                    dict = @{@"title": [NSString stringWithFormat:@"You sent %@ to %@ from %@", giftName, userTo, merchantName],
+                             @"date": fechaFinal,
+                             @"dateRedeem": fechaFinalRedeem,
+                             @"type":pictureType,
+                             @"isRedeemed": isRedeemed,
+                             @"image":receiverPicture};
+                }else if([self.screenType isEqualToString:@"R"]){
+                    dict = @{@"title": [NSString stringWithFormat:@"%@ sent you %@ from %@", userFrom, giftName, merchantName],
+                             @"date": fechaFinal,
+                             @"dateRedeem": fechaFinalRedeem,
+                             @"type":pictureType,
+                             @"isRedeemed": isRedeemed,
+                             @"image":senderPicture};
+                }
+                
                 [arrayAux addObject:dict];
             }
+            
         }
-        self.data = arrayAux;
+    }
+    
+    return  arrayAux;
+}
+
+
+
+-(void)fetchData2{
+    //NSLog(@"Local User: %@", self.localUser);
+    self.data = [NSArray new];
+    NSString *urlString = [NSString stringWithFormat:@"%@?session=%@", UPDATES_USER_V3, self.localUser.session ];
+    NSURL *url = [NSURL URLWithString:urlString];
+    NSLog(@"URL: %@", urlString);
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url
+                                                           cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData
+                                                       timeoutInterval:0.0];
+    NSURLResponse *response;
+    NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:nil];
+    NSDictionary *dictionary = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil]; //el json se guarda en este array
+    
+    NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
+    NSInteger codeService = [httpResponse statusCode];
+    if (codeService == 200) {
+        NSLog(@"Dictionary : %@", dictionary);
+        NSDictionary *dictStatus = [dictionary objectForKey:@"status"];
+        NSInteger code = [[dictStatus objectForKey:@"code"] integerValue];
+        if(code == 200){
+            NSArray *array = [dictionary objectForKey:@"updates"];
+            NSMutableArray *arrayAux = [NSMutableArray new];
+            NSDictionary *dict;
+            NSString *giftName, *merchantName, *userFrom, *userTo, *picture, *pictureType, *datetime, *sentOrReceived;
+            for (NSDictionary *dict2 in array) {
+                giftName = [dict2 objectForKey:@"giftName"];
+                merchantName = [dict2 objectForKey:@"merchantName"];
+                userFrom = [dict2 objectForKey:@"senderName"]; //De quien es
+                userTo = [dict2 objectForKey:@"receiverName"]; //A quien se lo envio
+                picture = [dict2 objectForKey:@"receiverPicture"];
+                //pictureType = [dict2 objectForKey:@"pictureType"];
+                datetime = [dict2 objectForKey:@"createdAt"];
+                pictureType = @"NAME";
+                sentOrReceived = [dict2 objectForKey:@"sentOrReceived"];
+                if ([sentOrReceived isEqualToString:@"sent"]) {
+                    //Regalos enviados
+                    double getDate = [datetime doubleValue];
+                    NSTimeInterval seconds = getDate / 1000;
+                    NSDate *date = [NSDate dateWithTimeIntervalSince1970:seconds];
+                    NSDateFormatter *dateFormat = [[NSDateFormatter alloc] init];
+                    [dateFormat setDateFormat:@"dd/MM/yyyy hh:mma"];
+                    NSString *dateString = [dateFormat stringFromDate:date];
+                    
+                    dict = @{@"title": [NSString stringWithFormat:@"You sent %@ to %@ from %@", giftName, userTo, merchantName],
+                             @"date": dateString,
+                             @"type":pictureType,
+                             @"image":picture};
+                    [arrayAux addObject:dict];
+                    
+                }
+                
+            }
+            self.data = arrayAux;
+        }
     }
     
 }
@@ -169,47 +320,35 @@
 
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
     
-    return [self.data count];
+    return [self.updateData count];
 }
 
-/*
--(CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section{
-    return 30;
-}
 
--(void)tableView:(UITableView *)tableView willDisplayHeaderView:(UIView *)view forSection:(NSInteger)section{
-    view.tintColor = [UIColor altruus_duckEggBlueColor];
-    view.backgroundColor = [UIColor altruus_duckEggBlueColor];
-}
-
--(UIView*)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section{
-    UILabel *myLabel = [[UILabel alloc] init];
-    
-    myLabel.frame = CGRectMake(0, 0, 200, 20);
-    myLabel.font = [UIFont boldSystemFontOfSize:12];
-    myLabel.text = [self tableView:tableView titleForHeaderInSection:section];
-    myLabel.textAlignment = NSTextAlignmentCenter;
-    myLabel.center = CGPointMake(SCREEN_WIDTH / 2 - 10, 15);
-    myLabel.textColor = [UIColor altruus_darkSkyBlueColor];
-    UIView *headerView = [[UIView alloc] init];
-    headerView.backgroundColor = [UIColor altruus_duckEggBlueColor];
-    
-    [headerView addSubview:myLabel];
-    return headerView;
-}
-*/
- 
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
     return 100;
 }
 
 
 -(UITableViewCell*)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"updateCell"];
-    if (!cell) {
-        [tableView registerNib:[UINib nibWithNibName:@"UpdatesTableViewCell" bundle:nil] forCellReuseIdentifier:@"updateCell"];
-        cell = [tableView dequeueReusableCellWithIdentifier:@"updateCell"];
+    
+    static NSString *cellLoadingIdentifier = @"Loading";
+    
+    if (indexPath.row < [self.updateData count]-1) {
+        
+        UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"giftCell"];
+        [tableView registerNib:[UINib nibWithNibName:@"GiftsReceivedTableViewCell" bundle:nil] forCellReuseIdentifier:@"giftCell"];
+        cell = [tableView dequeueReusableCellWithIdentifier:@"giftCell"];
+        return cell;
+    }else{
+        if(_actualResult < _totalResultsFound){
+            LoadingTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellLoadingIdentifier forIndexPath:indexPath];
+            [cell.activityIndicatorView startAnimating];
+            return cell;
+        }
     }
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"giftCell"];
+    [tableView registerNib:[UINib nibWithNibName:@"GiftsReceivedTableViewCell" bundle:nil] forCellReuseIdentifier:@"giftCell"];
+    cell = [tableView dequeueReusableCellWithIdentifier:@"giftCell"];
     return cell;
 }
 
@@ -222,30 +361,57 @@
     cell.accessoryType = UITableViewCellAccessoryNone;
     
     NSDictionary *update;
-    NSString *title, *date, *url, *pictureType;
+    NSString *title, *date, *url, *pictureType, *picture, *isRedeemed, *dateRedeem;
     
-    update = [self.data objectAtIndex:indexPath.row];
+    update = [self.updateData objectAtIndex:indexPath.row];
     if (![update isKindOfClass:[NSNull class]]) {
         title = update[@"title"];
         date = update[@"date"];
-        url = update[@"image"];
+        dateRedeem = update[@"dateRedeem"];
+        picture = update[@"image"];
         pictureType = update[@"type"];
+        isRedeemed = update[@"isRedeemed"];
     }
     
     if ([pictureType isEqualToString:@"NAME"]) {
         url = [NSString stringWithFormat:@"%@%@", PREFIJO_PHOTO, url];
     }
+   
+    if([isRedeemed isEqualToString:@"1"]){
+        ((GiftsReceivedTableViewCell*)cell).redeemImageview.hidden = NO;
+    }else{
+        ((GiftsReceivedTableViewCell*)cell).redeemImageview.hidden = YES;
+    }
     
-    ((UpdatesTableViewCell*)cell).mainLabel.text = title;
-    ((UpdatesTableViewCell*)cell).subLabel.text = date;
+    ((GiftsReceivedTableViewCell*)cell).mainLabel.text = title;
     
-    NSData *data = [NSData dataWithContentsOfURL : [NSURL URLWithString:url]];
+    NSString *aux1 = NSLocalizedString(@"Date Received", nil);
+    NSString *aux2 = NSLocalizedString(@"Date Redeemed", nil);
+    
+    aux1 = [NSString stringWithFormat:@"%@: %@", aux1, date];
+    aux2 = [NSString stringWithFormat:@"%@: %@", aux2, dateRedeem];
+    
+    if([isRedeemed isEqualToString:@"0"]){
+        aux2 = NSLocalizedString(@"Not Yet Redeemed", nil);
+    }
+    
+    ((GiftsReceivedTableViewCell*)cell).subLabel.text =   aux1;
+    ((GiftsReceivedTableViewCell*)cell).redeemLabel.text = aux2;
+    
+    NSString *urlImage = [NSString stringWithFormat:@"http://graph.facebook.com/%@/picture?type=square", picture];
+    
+    NSData *data = [NSData dataWithContentsOfURL : [NSURL URLWithString:urlImage]];
     UIImage *image = [UIImage imageWithData: data];
+    //[((UpdatesTableViewCell*)cell).imageView setImage:image];
+    [((GiftsReceivedTableViewCell*)cell).imageView setImage:image];
     
-    //NSString *urlImage = [NSString stringWithFormat:@"http://graph.facebook.com/%@/picture?type=square", update[@"senderPicture"]];
-    //NSData *data = [NSData dataWithContentsOfURL : [NSURL URLWithString:urlImage]];
-    //UIImage *image = [UIImage imageWithData: data];
-    [((UpdatesTableViewCell*)cell).imageView setImage:image];
+    
+    
+    if(indexPath.row+2 < _totalResultsFound && indexPath.row+2 == _actualResult){
+        _currentPage++;
+        [self fetchMoreData];
+        
+    }
     
 }
 

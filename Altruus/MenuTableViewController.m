@@ -108,7 +108,8 @@
 - (void)tappedShare
 {
     //NSString *inviteText = [NSString stringWithFormat:@"I just sent you a gift! Download Altruus from the following link to redeem."];
-    NSString *inviteText = [NSString stringWithFormat:@"Become happier by becoming a giver! Download Altrüus from the following link:"];
+    //NSString *inviteText = [NSString stringWithFormat:@"Become happier by becoming a giver! Download Altrüus from the following link:"];
+    NSString *inviteText = NSLocalizedString(@"Become happier by becoming a giver! Download Altrüus from the following link:", nil);
     /*
     if (![self.localUser.userID boolValue]){
         [PSTAlertController presentDismissableAlertWithTitle:NSLocalizedString(@"Error", nil)

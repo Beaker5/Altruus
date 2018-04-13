@@ -38,6 +38,12 @@
 @property (nonatomic, retain) NSString *userIDAltruus;
 @property (nonatomic, retain) NSString *fbIDAltruus;
 @property (nonatomic, retain) NSString *tokenAltruus;
+
+@property (nonatomic, retain) NSString *sessionExpires;
+@property (nonatomic, retain) NSString *phoneNumber;
+@property (nonatomic, retain) NSString *session;
+@property (nonatomic, retain) NSString *sessionCreated;
+
 @end
 
 @interface User (CoreDataGeneratedAccessors)

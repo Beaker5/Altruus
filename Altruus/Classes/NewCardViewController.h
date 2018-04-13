@@ -14,15 +14,7 @@
 
 @protocol ExampleViewControllerDelegate;
 
-/*
-@protocol NewCardViewControllerDelegate <NSObject>
--(void)newCardViewController:(NewCardViewController*)controller didFinish:(NSError*)error;
-@end
-*/
-
 @interface NewCardViewController : UIViewController
-
-//@property (nonatomic, weak) id<NewCardViewControllerDelegate> delegate;
 
 @property (nonatomic, weak) id<ExampleViewControllerDelegate> delegate;
 @property (assign) User *localUser;

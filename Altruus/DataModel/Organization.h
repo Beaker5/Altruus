@@ -22,6 +22,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable, nonatomic, copy) NSString *photo;
 @property (nullable, nonatomic, copy) NSString *idO;
 @property (nullable, nonatomic, copy) NSString *origin;
+@property (nullable, nonatomic, copy) NSString *idString;
 
 @end
 

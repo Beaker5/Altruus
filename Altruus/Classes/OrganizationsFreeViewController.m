@@ -1,12 +1,12 @@
 //
-//  OrganizationsViewController.m
-//  Altruus-Abundance
+//  OrganizationsFreeViewController.m
+//  Altruus
 //
-//  Created by CJ Ogbuehi on 7/11/16.
-//  Copyright © 2016 Altruus LLC. All rights reserved.
+//  Created by Alberto Rivera on 07/11/17.
+//  Copyright © 2017 Altruus LLC. All rights reserved.
 //
 
-#import "OrganizationsViewController.h"
+#import "OrganizationsFreeViewController.h"
 #import "OrganizationProfileViewController.h"
 #import "UISegmentedControl+Utils.h"
 #import "constants.h"
@@ -20,8 +20,9 @@
 #import "Servicios.h"
 #import "DataProvider.h"
 #import "Organization.h"
+#import <MZFormSheetController.h>
 
-@interface OrganizationsViewController ()<UITableViewDataSource,UITableViewDelegate, UISearchBarDelegate>
+@interface OrganizationsFreeViewController ()<UITableViewDataSource,UITableViewDelegate, UISearchBarDelegate>
 @property (nonatomic, weak) IBOutlet UISegmentedControl *segmentedControl;
 @property (nonatomic, weak) IBOutlet UITableView *tableView;
 @property (weak, nonatomic) IBOutlet UISearchBar *searchBar;
@@ -36,12 +37,10 @@
 @property (assign) NSInteger actualResult;
 @property (assign) NSInteger sizeResults;
 @property (assign) NSInteger totalResultsFound;
-@property (assign) NSInteger currentPage;
-@property (assign) NSInteger sizePerPage;
 
 @end
 
-@implementation OrganizationsViewController
+@implementation OrganizationsFreeViewController
 -(void)viewDidLoad{
     [super viewDidLoad];
     
@@ -87,21 +86,12 @@
     self.searchBar.showsCancelButton = YES;
     self.searchBar.delegate = self;
     
-    //COMENTADO
-    // add search icon
-    //FAKIonIcons *searchIcon = [FAKIonIcons iosSearchStrongIconWithSize:30];
-    //[searchIcon addAttribute:NSForegroundColorAttributeName value:[UIColor altruus_darkSkyBlueColor]];
-    //UIImage *searchImage = [searchIcon imageWithSize:CGSizeMake(30, 30)];
-    //self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithImage:searchImage style:UIBarButtonItemStylePlain target:self action:@selector(tappedSearch)];
     
     self.tableView.backgroundColor = [UIColor altruus_duckEggBlueColor];
     self.tableView.layer.cornerRadius = 5;
     
     self.searchBar.showsCancelButton = YES;
     self.searchBar.delegate = self;
-    
-    _currentPage = 1;
-    _sizePerPage = 8;
 }
 
 -(void)fetchData{
@@ -136,8 +126,6 @@
     
 }
 
-
-
 -(NSArray*)getBusinessFromOrganizations:(NSString*)substring{
     NSMutableArray *organizations = [NSMutableArray new];
     
@@ -165,7 +153,6 @@
     
     NSString *urlString = [NSString stringWithFormat:@"%@?merchantType=business&session=%@", BUSINESS_ORGANIZATIONS_V3, self.localUser.session ];
     NSURL *url = [NSURL URLWithString:urlString];
-    
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url
                                                            cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData
                                                        timeoutInterval:0.0];
@@ -185,7 +172,6 @@
     [formatter setUsesGroupingSeparator:YES];
     
     if (codeService == 200) {
-        NSLog(@"URL: %@", urlString);
         NSLog(@"Dictionary : %@", dictionary);
         NSDictionary *dictStatus = [dictionary objectForKey:@"status"];
         NSInteger code = [[dictStatus objectForKey:@"code"] integerValue];
@@ -232,47 +218,6 @@
         });
         
     }
-    /*
-    
-    
-    
-    if(code == 200){
-        NSLog(@"Org: %@", array);
-        //NSMutableArray *arrayAux = [NSMutableArray new];
-        //NSDictionary *dict;
-        NSString *idO, *picture, *name;
-        float distance;
-        NSString *strAux;
-        for (NSDictionary *dictionary in array) {
-            idO = [dictionary objectForKey:@"id"];
-            distance = [[dictionary objectForKey:@"distance"] floatValue];
-            picture = [dictionary objectForKey:@"pictue"];
-            name = [dictionary objectForKey:@"name"];
-     
-            Organization *org = [NSEntityDescription insertNewObjectForEntityForName:@"Organization" inManagedObjectContext:managedContext];
-            org.name = name;
-            //org.distance = [NSString stringWithFormat:@"%.02f", distance];
-            strAux = [formatter stringFromNumber:[NSNumber numberWithFloat:distance]];
-            strAux = [strAux stringByReplacingOccurrencesOfString:@"$" withString:@""];
-            strAux = [NSString stringWithFormat:@"%@ km", strAux];
-            org.distance = strAux;
-            org.photo = picture;
-            org.idO = idO;
-            org.origin = @"B";
-            
-            NSError *error;
-            if (![managedContext save:&error]) {
-                NSLog(@"Error Para Guardar: %@", [error localizedDescription]);
-            }
-        }
-        //_data = arrayAux;
-    }
-    dispatch_async(dispatch_get_main_queue(), ^{
-        self.data = [self getBusinessFromOrganizations:nil];
-        [self.tableView reloadData];
-        [self.hud hide:YES];
-    });
-     */
 }
 
 -(void)getBusinessOrganizations{
@@ -317,9 +262,6 @@
     
     
     if(code == 200){
-        NSLog(@"Org: %@", array);
-        //NSMutableArray *arrayAux = [NSMutableArray new];
-        //NSDictionary *dict;
         NSString *idO, *picture, *name;
         float distance;
         NSString *strAux;
@@ -328,13 +270,7 @@
             distance = [[dictionary objectForKey:@"distance"] floatValue];
             picture = [dictionary objectForKey:@"pictue"];
             name = [dictionary objectForKey:@"name"];
-            /*
-            dict = @{@"id": idO,
-                     @"distance": distance,
-                     @"image": picture,
-                     @"name": name};
-            [arrayAux addObject:dict];
-             */
+            
             Organization *org = [NSEntityDescription insertNewObjectForEntityForName:@"Organization" inManagedObjectContext:managedContext];
             org.name = name;
             //org.distance = [NSString stringWithFormat:@"%.02f", distance];
@@ -390,63 +326,6 @@
 }
 
 
-/*
--(NSArray*)data{
-    if (!_data) {
-        
-        NSMutableDictionary *dict = [[NSMutableDictionary alloc]init];
-        [dict setObject:self.localUser.tokenAltruus forKey:@"token"];
-        [dict setObject:self.localUser.userIDAltruus forKey:@"userId"];
-        [dict setObject:[NSString stringWithFormat:@"%f", self.locationManager.location.coordinate.longitude] forKey:@"longitude"];
-        [dict setObject:[NSString stringWithFormat:@"%f", self.locationManager.location.coordinate.latitude] forKey:@"latitude"];
-        
-        NSData *jsonData = [NSJSONSerialization dataWithJSONObject:dict options:0 error:nil];
-        NSString *jsonString;
-        if (!jsonData) {
-        } else {
-            jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-        }
-        
-        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:BUSINESS_ORGANIZATIONS]];
-        request.HTTPMethod = @"POST";
-        [request setValue:@"application/json; charset=utf-8" forHTTPHeaderField:@"Content-Type"];
-        request.HTTPBody = jsonData;
-        
-        NSURLResponse *res = nil;
-        NSError *err = nil;
-        
-        NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&res error:&err];
-        NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)res;
-        
-        NSInteger code = [httpResponse statusCode];
-        NSArray *array = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
-        
-        if(code == 200){
-            NSLog(@"Organizations: %@", array);
-            NSMutableArray *arrayAux = [NSMutableArray new];
-            NSDictionary *dict;
-            NSString *idO, *distance, *picture, *name;
-            
-            for (NSDictionary *dictionary in array) {
-                idO = [dictionary objectForKey:@"id"];
-                distance = [dictionary objectForKey:@"distance"];
-                picture = [dictionary objectForKey:@"pictue"];
-                name = [dictionary objectForKey:@"name"];
-                
-                dict = @{@"id": idO,
-                         @"distance": distance,
-                         @"image": picture,
-                         @"name": name};
-                [arrayAux addObject:dict];
-            }
-            _data = arrayAux;
-        }
-    }
-    return _data;
-}
-
-*/
-
 #pragma -mark Tableview Datasource and Delegate
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView{
     return 1;
@@ -469,13 +348,14 @@
     view.backgroundColor = [UIColor altruus_duckEggBlueColor];
 }
 
+
 -(UIView*)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section{
     UILabel *myLabel = [[UILabel alloc] init];
     myLabel.frame = CGRectMake(50, 8, 200, 20);
     myLabel.font = [UIFont boldSystemFontOfSize:12];
     myLabel.text = [self tableView:tableView titleForHeaderInSection:section];
     myLabel.textAlignment = NSTextAlignmentCenter;
-    myLabel.center = CGPointMake(SCREEN_WIDTH / 2 - 10, 15);
+    //myLabel.center = CGPointMake(SCREEN_WIDTH / 2 - 10, 15);
     
     if (section == 0) {
         myLabel.textColor = [UIColor altruus_darkSkyBlueColor];
@@ -489,6 +369,7 @@
     
     return headerView;
 }
+ 
 
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
     return 100;
@@ -544,28 +425,26 @@
     ((OrgTableViewCell*)cell).nameLabel.text = name;
     ((OrgTableViewCell*)cell).distanceLabel.text = distance;
     [((OrgTableViewCell*)cell).orgImageView sd_setImageWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@%@", PREFIJO_PHOTO_V3,url]] placeholderImage:[UIImage imageNamed:@"placeholder"]];
-    
-    NSLog(@"URL: %@", [NSURL URLWithString:[NSString stringWithFormat:@"%@%@", PREFIJO_PHOTO_V3,url]]);
 }
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
-    UIViewController *controller = [self.storyboard instantiateViewControllerWithIdentifier:kV2StoryboardOrganizationProfilev2];
-    if ([controller isKindOfClass:[OrganizationProfileViewController class]]) {
-        //((OrganizationProfileViewController*)controller).organizationName = @"Pepsico";
-        ((OrganizationProfileViewController*)controller).friend = self.friend;
-        ((OrganizationProfileViewController*)controller).vieneDeAmigos = self.vieneDeAmigos;
-        ((OrganizationProfileViewController*)controller).organization = [self.data objectAtIndex:indexPath.row];
-        
-    }
-    [self.navigationController pushViewController:controller animated:YES];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"NotifGratuitos" object:nil userInfo:[self.data objectAtIndex:indexPath.row]];
+    
+    [self mz_dismissFormSheetControllerAnimated:YES completionHandler:^(MZFormSheetController *formSheetController) {
+        // do something 
+    }];
+    
 }
+
+
 
 #pragma -mark Search bar delegate methods
 - (void)searchBarCancelButtonClicked:(UISearchBar *)searchBar{
     self.searchBar.text = @"";
     [searchBar resignFirstResponder];
-
+    
 }
 
 -(void)searchBar:(UISearchBar *)searchBar textDidChange:(NSString *)searchText{
@@ -577,3 +456,4 @@
     [searchBar resignFirstResponder];
 }
 @end
+

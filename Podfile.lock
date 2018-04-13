@@ -23,12 +23,24 @@ PODS:
   - AMPopTip (1.4.2)
   - Appirater (2.1.2)
   - BFKit (1.9.3)
+  - Bolts (1.8.4):
+    - Bolts/AppLinks (= 1.8.4)
+    - Bolts/Tasks (= 1.8.4)
+  - Bolts/AppLinks (1.8.4):
+    - Bolts/Tasks
+  - Bolts/Tasks (1.8.4)
   - Branch (0.13.5):
     - Branch/Core (= 0.13.5)
     - Branch/without-IDFA (= 0.13.5)
   - Branch/Core (0.13.5)
   - Branch/without-IDFA (0.13.5)
   - DateTools (2.0.0)
+  - FBSDKCoreKit (4.25.0):
+    - Bolts (~> 1.7)
+  - FBSDKLoginKit (4.25.0):
+    - FBSDKCoreKit
+  - FBSDKShareKit (4.25.0):
+    - FBSDKCoreKit
   - FontAwesomeKit/Core (2.2.1)
   - FontAwesomeKit/FontAwesome (2.2.1):
     - FontAwesomeKit/Core
@@ -49,6 +61,7 @@ PODS:
   - OneSignal (2.4.1)
   - PSTAlertController (1.2.0)
   - RSKImageCropper (1.6.0)
+  - SBJson (4.0.5)
   - SCLAlertView-Objective-C (1.1.1)
   - SDWebImage (3.8.2):
     - SDWebImage/Core (= 3.8.2)
@@ -67,6 +80,9 @@ DEPENDENCIES:
   - BFKit
   - Branch
   - DateTools
+  - FBSDKCoreKit
+  - FBSDKLoginKit
+  - FBSDKShareKit
   - FontAwesomeKit/FontAwesome
   - FontAwesomeKit/IonIcons
   - IQKeyboardManager
@@ -79,6 +95,7 @@ DEPENDENCIES:
   - OneSignal (~> 2.0)
   - PSTAlertController
   - RSKImageCropper
+  - SBJson (~> 4.0.0)
   - SCLAlertView-Objective-C
   - SDWebImage (~> 3.6)
   - Stripe
@@ -91,8 +108,12 @@ SPEC CHECKSUMS:
   AMPopTip: e53d714c276d2a3b2b10914c5d7db486d35a041e
   Appirater: f1c9e53e8b612193e6256144f6a0fd2e31f4340d
   BFKit: e581dc0609b462aea9ceb02417ceb5b26ede3316
+  Bolts: 8a7995239dbe724f9cba2248b766d48b7ebdd322
   Branch: 08e40d84f20b188443fd808fe01dadcc13d1727e
   DateTools: 933ac9c490f21f92127cf690ccd8c397e0126caf
+  FBSDKCoreKit: 53e3f4bfb64e80c5f229dd30ae33ff57fbbbd2d1
+  FBSDKLoginKit: f628c09684dae9c17f071cf90b014e886f5093ea
+  FBSDKShareKit: aea699d3cac749af08e360f4e949b82ffa8813f5
   FontAwesomeKit: 3614979b3dbb0ec3f7fac1bd760b91f66c31db67
   IQKeyboardManager: 249c3946acf61345c18b038eb50863fe2793e3a8
   JDStatusBarNotification: 2b4f29bd68a60d7aa2f190b5265f1ce59c18aaf8
@@ -105,6 +126,7 @@ SPEC CHECKSUMS:
   OneSignal: cb16562fcc8d462e09c5fb9a79b12295548964e1
   PSTAlertController: 9b802dfbda54fee2683bfd6dda7023a6de895d5b
   RSKImageCropper: 6903235c7a8a79acb1e1f3490e2c911b858f8208
+  SBJson: af3137ccda22be3004487524da0a071c75d4251b
   SCLAlertView-Objective-C: d397ae2b52bae7dedf7188fa1616fcb89200b33a
   SDWebImage: 098e97e6176540799c27e804c96653ee0833d13c
   Stripe: 2bb9646115745d0ee8c7799e6872c57ba5dc6cc5
@@ -112,6 +134,6 @@ SPEC CHECKSUMS:
   Tweaks: 524fa47636cce3bf3a4d9156e980f10ae9480e81
   ZXingObjC: bf15b3814f7a105b6d99f47da2333c93a063650a
 
-PODFILE CHECKSUM: 0daa0e192c5ba865ce4181d8f01c35e08cd80ca8
+PODFILE CHECKSUM: 117571da231394e8fed5e9c82e81b78624c45253
 
 COCOAPODS: 1.2.1
